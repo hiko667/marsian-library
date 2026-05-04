@@ -29,3 +29,11 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+.bg-mars-dark {
+    background-color: #8b0000 !important;
+}
+
+.navbar-mars .nav-link, .navbar-mars .navbar-brand {
+    color: white !important;
+}
