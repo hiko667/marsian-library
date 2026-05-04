@@ -11,8 +11,8 @@ Upewnijcie się, że macie dockera. Następnie, będąc w terminalu w folderze w
 
 ```bash
   dotnet add package Oracle.EntityFrameworkCore --version 8.21.121
-  dotnet add package Microsoft.EntityFrameworkCore.Design --version 9.0.2
-  dotnet add package Microsoft.AspNetCore.Identity.EntityFrameworkCore --version 9.0.2
+  dotnet add package Microsoft.AspNetCore.Identity.EntityFrameworkCore --version 8.0.11
+  dotnet add package Microsoft.EntityFrameworkCore.Design --version 8.0.11
 ```
 Jak już się zainstalują, upewnijcie się, że macie plik docker-compose.yml. Dodałem go do repo. Jak macie dockera wykonujecie polecenie:
 
