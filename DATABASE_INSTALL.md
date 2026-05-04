@@ -21,3 +21,17 @@ Jak już się zainstalują, upewnijcie się, że macie plik docker-compose.yml. 
   dotnet ef database update
 ```
 Wychodząc oczywiście z założenia, że macie dockera i w kodzie są już jakieś migracje. Zgaduję, że za każdym razem, jak będą nowe migracje trzeba robić te databse update
+Zanim uruchomicie bazę upewnijcie się, że działa. Jak? 
+
+```bash
+  docker logs -f oracle-db
+```
+
+Jak widzicie to:
+```bash
+  #########################
+  DATABASE IS READY TO USE! 
+  #########################
+
+```
+To znaczy, że git (git push badum tss)
