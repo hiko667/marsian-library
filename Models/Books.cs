@@ -8,7 +8,6 @@ public class Book
     public int Id { get; set; }
 
     [Required]
-    [Column(TypeName = "varchar(50)")]
     [MaxLength(256)]
     public string Title { get; set; }
 
@@ -18,12 +17,14 @@ public class Book
     [RegularExpression(@"^[0-9]+$", ErrorMessage = "ISBN może zawierać tylko cyfry")]
     public string Isbn { get; set; }
 
-    public int PublisherId { get; set; }
 
-    // WAŻNE: dodaj ? aby wskazać, że to opcjonalna relacja
+    [Required]
     [ForeignKey("PublisherId")]
-    public virtual Publisher Publisher { get; set; }  // Dodaj ? tutaj!
+    public int PublisherId { get; set; }
+    public virtual Publisher Publisher { get; set; }
 
     public ICollection<Genre> Genres { get; set; } = new List<Genre>();
     public ICollection<Author> Authors { get; set; } = new List<Author>();
+    public ICollection<Language> Languages { get; set; } = new List<Language>();
+
 }

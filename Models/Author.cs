@@ -8,12 +8,11 @@ public class Author
     public int Id { get; set; }
 
     [Required]
-    [Column(TypeName = "varchar(50)")]
     [MaxLength(100)]
     public string Name { get; set; }
     [Required]
-    [Column(TypeName = "varchar(50)")]
     [MaxLength(100)]
     public string Lastname { get; set; }
+    public ICollection<Book> Books { get; set; } = new List<Book>();
 
 }

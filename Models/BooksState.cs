@@ -3,12 +3,12 @@ using System.ComponentModel.DataAnnotations.Schema; // Dla [Column]
 
 namespace marsian_library.Models;
 
-public class Publisher
+public class BookState
 {
     public int Id { get; set; }
 
     [Required]
-    [MaxLength(256)]
+    [MaxLength(100)]
     public string Name { get; set; }
 
 }
