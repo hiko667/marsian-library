@@ -8,11 +8,12 @@ public class Author
     public int Id { get; set; }
 
     [Required]
-    [MaxLength(100)]
-    public string Name { get; set; }
-    [Required]
-    [MaxLength(100)]
-    public string Lastname { get; set; }
-    public ICollection<Book> Books { get; set; } = new List<Book>();
+    [MaxLength(50)]
+    public string FirstName { get; set; } = string.Empty;
 
+    [Required]
+    [MaxLength(50)]
+    public string LastName { get; set; } = string.Empty;
+
+    public ICollection<Book> Books { get; set; } = new List<Book>();
 }
