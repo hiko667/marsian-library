@@ -16,4 +16,7 @@ public class Author
     public string LastName { get; set; } = string.Empty;
 
     public ICollection<Book> Books { get; set; } = new List<Book>();
+
+    [NotMapped]
+    public string FullName => $"{FirstName} {LastName}";
 }

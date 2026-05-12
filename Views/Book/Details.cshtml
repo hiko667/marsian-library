@@ -1,36 +1,82 @@
 @model marsian_library.Models.Book
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Book Details";
 }
 
-<h1>Details</h1>
+<h1>@Model.Title</h1>
 
-<div>
-    <h4>Book</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Isbn)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Isbn)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Publisher)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Publisher.Name)
-        </dd>
-    </dl>
+<div class="row">
+    <div class="col-md-6">
+        <h4>Book Information</h4>
+        <table class="table table-bordered">
+            <tr>
+                <th>ISBN</th>
+                <td>@Model.Isbn</td>
+            </tr>
+            <tr>
+                <th>Publisher</th>
+                <td>@Model.Publisher?.Name</td>
+            </tr>
+            <tr>
+                <th>Authors</th>
+                <td>
+                    @if (Model.Authors != null && Model.Authors.Any())
+                    {
+                        <ul>
+                            @foreach (var author in Model.Authors)
+                            {
+                                <li>@author.FullName</li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <span>-</span>
+                    }
+                </td>
+            </tr>
+            <tr>
+                <th>Genres</th>
+                <td>
+                    @if (Model.Genres != null && Model.Genres.Any())
+                    {
+                        <ul>
+                            @foreach (var genre in Model.Genres)
+                            {
+                                <li>@genre.Name</li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <span>-</span>
+                    }
+                </td>
+            </tr>
+            <tr>
+                <th>Languages</th>
+                <td>
+                    @if (Model.Languages != null && Model.Languages.Any())
+                    {
+                        <ul>
+                            @foreach (var language in Model.Languages)
+                            {
+                                <li>@language.Name</li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <span>-</span>
+                    }
+                </td>
+            </tr>
+        </table>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+<div class="mt-3">
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
 </div>
