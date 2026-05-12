@@ -57,6 +57,15 @@ namespace marsian_library.Data
             builder.Entity<Book>()
                 .HasIndex(b => b.Isbn)
                 .IsUnique();
+            builder.Entity<ApplicationUser>()
+                .HasOne(u => u.Reader)
+                .WithOne()
+                .HasForeignKey<ApplicationUser>(u => u.ReaderId);
+
+            builder.Entity<ApplicationUser>()
+                .HasOne(u => u.Emp)
+                .WithOne()
+                .HasForeignKey<ApplicationUser>(u => u.EmpId);
         }
     }
 }
