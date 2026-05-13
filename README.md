@@ -32,4 +32,4 @@ Dodatkowo:
 
 
 
-![Logo](https://gifdb.com/images/high/rickroll-never-gonna-give-you-up-gif-tuwyt436mnmfm59i.webp)
+![Logo](https://gifdb.com/images/high/rickroll-rick-astley-get-rickrolled-format-t2h9jutd39kd7mvr.webp)
