@@ -26,3 +26,10 @@ Dodatkowo:
 7. Aplikacja jest przejrzysta i estetyczna (zastosowanie zmian w stylowaniu)
 8. Aplikacja obsługuje załączniki (w formularzach oraz umożliwia pobieranie plików) 
 9. Aplikacja Generuje dokumenty (np.: pdf, excel, word) - można wybrać 1 typ dokumentu – **excel z listą wypożyczeń czytelnika?**
+
+
+
+
+
+
+![Logo](https://gifdb.com/images/high/rickroll-never-gonna-give-you-up-gif-tuwyt436mnmfm59i.webp)
