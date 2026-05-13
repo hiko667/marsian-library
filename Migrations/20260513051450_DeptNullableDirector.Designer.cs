@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Oracle.EntityFrameworkCore.Metadata;
 using marsian_library.Data;
@@ -11,9 +12,11 @@ using marsian_library.Data;
 namespace marsian_library.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260513051450_DeptNullableDirector")]
+    partial class DeptNullableDirector
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -477,6 +480,7 @@ namespace marsian_library.Migrations
                         .HasColumnType("NUMBER(10)");
 
                     b.Property<int?>("DirectorId")
+                        .IsRequired()
                         .HasColumnType("NUMBER(10)");
 
                     b.HasKey("Id");
@@ -868,7 +872,8 @@ namespace marsian_library.Migrations
                     b.HasOne("marsian_library.Models.Emp", "Director")
                         .WithMany()
                         .HasForeignKey("DirectorId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Address");
 
