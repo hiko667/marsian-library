@@ -1,8 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using marsian_library.Data;
-using marsian_library.Models;
-using System.Collections.Generic;
+using marsian_library.Services;
 using System.Threading.Tasks;
 
 namespace marsian_library.Controllers;
@@ -11,78 +8,37 @@ namespace marsian_library.Controllers;
 [Route("api/[controller]")]
 public class BookApiController : ControllerBase
 {
-    private readonly AppDbContext _context;
+    private readonly IBookService _bookService;
 
-    public BookApiController(AppDbContext context)
+    public BookApiController(IBookService bookService)
     {
-        _context = context;
+        _bookService = bookService;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAllBooks()
     {
-        var books = await _context.Books
-            .Select(b => new 
-            {
-                b.Id,
-                b.Title,
-                b.Isbn,
-                Publisher = b.Publisher != null ? b.Publisher.Name : "Brak wydawcy",
-                Genres = b.Genres.Select(g => g.Name).ToList(),
-                Authors = b.Authors.Select(a => a.FirstName + " " + a.LastName).ToList(),
-                Languages = b.Languages.Select(l => l.Name).ToList()
-            })
-            .ToListAsync();
-
+        var books = await _bookService.GetAllBooksAsync();
         return Ok(books);
     }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetBook(int id)
+    [HttpGet("{guid}")]
+    public async Task<IActionResult> GetBook(string guid)
     {
-        var book = await _context.Books
-            .Where(b => b.Id == id)
-            .Select(b => new
-            {
-                b.Id,
-                b.Title,
-                b.Isbn,
-                Publisher = b.Publisher != null ? b.Publisher.Name : "Brak wydawcy",
-                Genres = b.Genres.Select(g => g.Name).ToList(),
-                Authors = b.Authors.Select(a => a.FirstName + " " + a.LastName).ToList(),
-                Languages = b.Languages.Select(l => l.Name).ToList()
-            })
-            .FirstOrDefaultAsync();
+        var book = await _bookService.GetBookByGuidAsync(guid);
         
         if (book == null)
         {
-            return NotFound(new { message = $"Nie znaleziono książki o ID {id}" });
+            return NotFound(new { message = $"Nie znaleziono książki o identyfikatorze GUID: {guid}" });
         }
 
         return Ok(book);
     }
 
     [HttpGet("available")]
-    public async Task<IActionResult> GetAvaiable()
+    public async Task<IActionResult> GetAvailable()
     {
-        var books = await _context.Books
-            .Where(b => _context.Copies
-                .Any(c => c.BookId == b.Id &&
-                    !_context.Borrows.Any(borrow =>
-                        borrow.CopyId == c.Id &&
-                        borrow.ReturnDate == null))) 
-            .Select(b => new 
-            {
-                b.Id,
-                b.Title,
-                b.Isbn,
-                Publisher = b.Publisher != null ? b.Publisher.Name : "Brak wydawcy",
-                Genres = b.Genres.Select(g => g.Name).ToList(),
-                Authors = b.Authors.Select(a => a.FirstName + " " + a.LastName).ToList(),
-                Languages = b.Languages.Select(l => l.Name).ToList()
-            })
-            .ToListAsync();
-
+        var books = await _bookService.GetAvailableBooksAsync();
         return Ok(books);
     }
 }
