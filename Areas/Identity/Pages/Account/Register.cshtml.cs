@@ -102,8 +102,8 @@ namespace marsian_library.Areas.Identity.Pages.Account
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
 
-            [Required(ErrorMessage = "Wybierz rolę")]
-            public string Role { get; set; } // "Reader" lub "Employee"
+            [Required(ErrorMessage = "Pick Role")]
+            public string Role { get; set; }
 
             [Required]
             public string FirstName { get; set; }
