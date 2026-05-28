@@ -19,6 +19,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using Humanizer;
+using marsian_library.Data;
 
 namespace marsian_library.Areas.Identity.Pages.Account
 {
@@ -27,6 +29,7 @@ namespace marsian_library.Areas.Identity.Pages.Account
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IUserStore<ApplicationUser> _userStore;
+        private readonly AppDbContext _context;
         private readonly IUserEmailStore<ApplicationUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
@@ -98,6 +101,28 @@ namespace marsian_library.Areas.Identity.Pages.Account
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+
+            [Required(ErrorMessage = "Wybierz rolę")]
+            public string Role { get; set; } // "Reader" lub "Employee"
+
+            [Required]
+            public string FirstName { get; set; }
+
+            [Required]
+            public string LastName { get; set; }
+            [Required]
+            public string City { get; set; }
+            [Required]
+            public string Street { get; set; }
+            [Required]
+            public string Building { get; set; }
+            [Required]
+            public string Apartment { get; set; }
+            [Required]
+            public string ZipCode { get; set; }
+            [Required]
+            public int? DeptId { get; set; }
+            public int? JobId { get; set; }
         }
 
 
@@ -111,17 +136,57 @@ namespace marsian_library.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            
             if (ModelState.IsValid)
             {
+                var newAddress = new Address {
+                    Street = Input.Street,
+                    City = Input.City,
+                    Apartment = Input.Apartment,
+                    Building = Input.Building,
+                    ZipCode = Input.ZipCode,
+                };
+                _context.Addresses.Add(newAddress);
+                await _context.SaveChangesAsync();
+
                 var user = CreateUser();
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+                if (Input.Role == "Employee")
+                {
+                    var emp = new Emp
+                    {
+                        FirstName = Input.FirstName,
+                        LastName = Input.LastName,
+                        AddressId = newAddress.Id,
+                        DeptId = Input.DeptId ?? 0,
+                        JobId = Input.JobId ?? 0
+                    };
+                    _context.Emps.Add(emp);
+                    await _context.SaveChangesAsync();
+                    user.EmpId = emp.Id;
+                }
+                else if (Input.Role == "Reader")
+                {
+                    var reader = new Reader
+                    {
+                        FirstName = Input.FirstName,
+                        LastName = Input.LastName,
+                        AddressId = newAddress.Id
+                    };
+                    _context.Readers.Add(reader);
+                    await _context.SaveChangesAsync();
+                    user.ReaderId = reader.Id; 
+                }
+
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
+
+                    await _userManager.AddToRoleAsync(user, Input.Role);
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -150,8 +215,6 @@ namespace marsian_library.Areas.Identity.Pages.Account
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
-
-            // If we got this far, something failed, redisplay form
             return Page();
         }
 

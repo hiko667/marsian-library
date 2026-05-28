@@ -12,9 +12,8 @@ public class Dept
     public int AddressId { get; set; }
     public virtual Address? Address { get; set; }
 
-    [Required]
     [ForeignKey("DirectorId")]
-    public int DirectorId { get; set; }
+    public int? DirectorId { get; set; }
     public virtual Emp? Director { get; set; }
 
     public ICollection<Emp> Emps { get; set; } = new List<Emp>();

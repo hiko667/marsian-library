@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Oracle.EntityFrameworkCore.Metadata;
 using marsian_library.Data;
@@ -11,9 +12,11 @@ using marsian_library.Data;
 namespace marsian_library.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260512165245_afterpull")]
+    partial class afterpull
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -257,9 +260,6 @@ namespace marsian_library.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("NUMBER(1)");
 
-                    b.Property<int?>("EmpId")
-                        .HasColumnType("NUMBER(10)");
-
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("NUMBER(1)");
 
@@ -283,9 +283,6 @@ namespace marsian_library.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("NUMBER(1)");
 
-                    b.Property<int?>("ReaderId")
-                        .HasColumnType("NUMBER(10)");
-
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("NVARCHAR2(2000)");
 
@@ -298,10 +295,6 @@ namespace marsian_library.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EmpId")
-                        .IsUnique()
-                        .HasFilter("\"EmpId\" IS NOT NULL");
-
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -309,10 +302,6 @@ namespace marsian_library.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("\"NormalizedUserName\" IS NOT NULL");
-
-                    b.HasIndex("ReaderId")
-                        .IsUnique()
-                        .HasFilter("\"ReaderId\" IS NOT NULL");
 
                     b.ToTable("AspNetUsers", "SYSTEM");
                 });
@@ -490,7 +479,7 @@ namespace marsian_library.Migrations
                     b.Property<int>("AddressId")
                         .HasColumnType("NUMBER(10)");
 
-                    b.Property<int?>("DirectorId")
+                    b.Property<int>("DirectorId")
                         .HasColumnType("NUMBER(10)");
 
                     b.HasKey("Id");
@@ -757,21 +746,6 @@ namespace marsian_library.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("marsian_library.Models.ApplicationUser", b =>
-                {
-                    b.HasOne("marsian_library.Models.Emp", "Emp")
-                        .WithOne()
-                        .HasForeignKey("marsian_library.Models.ApplicationUser", "EmpId");
-
-                    b.HasOne("marsian_library.Models.Reader", "Reader")
-                        .WithOne()
-                        .HasForeignKey("marsian_library.Models.ApplicationUser", "ReaderId");
-
-                    b.Navigation("Emp");
-
-                    b.Navigation("Reader");
-                });
-
             modelBuilder.Entity("marsian_library.Models.Book", b =>
                 {
                     b.HasOne("marsian_library.Models.Publisher", "Publisher")
@@ -897,7 +871,8 @@ namespace marsian_library.Migrations
                     b.HasOne("marsian_library.Models.Emp", "Director")
                         .WithMany()
                         .HasForeignKey("DirectorId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Address");
 
