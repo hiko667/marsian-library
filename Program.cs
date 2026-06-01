@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using marsian_library.Data;   
 using marsian_library.Models;
+using marsian_library.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +27,8 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => {
 .AddDefaultUI(); 
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddRazorPages(); 
+builder.Services.AddRazorPages();
+builder.Services.AddScoped<IBookService, BookService>();
 
 var app = builder.Build();
 
@@ -40,7 +42,7 @@ using (var scope = app.Services.CreateScope())
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Wystąpił błąd podczas dodawania ról do bazy.");
+        logger.LogError(ex, "Role error");
     }
 }
 

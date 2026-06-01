@@ -12,8 +12,8 @@ using marsian_library.Data;
 namespace marsian_library.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260513051923_DeptNullableDirectorFIXED")]
-    partial class DeptNullableDirectorFIXED
+    [Migration("20260528211124_AddGuidToBook")]
+    partial class AddGuidToBook
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -260,6 +260,9 @@ namespace marsian_library.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("NUMBER(1)");
 
+                    b.Property<int?>("EmpId")
+                        .HasColumnType("NUMBER(10)");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("NUMBER(1)");
 
@@ -283,6 +286,9 @@ namespace marsian_library.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("NUMBER(1)");
 
+                    b.Property<int?>("ReaderId")
+                        .HasColumnType("NUMBER(10)");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("NVARCHAR2(2000)");
 
@@ -295,6 +301,10 @@ namespace marsian_library.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("EmpId")
+                        .IsUnique()
+                        .HasFilter("\"EmpId\" IS NOT NULL");
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -302,6 +312,10 @@ namespace marsian_library.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("\"NormalizedUserName\" IS NOT NULL");
+
+                    b.HasIndex("ReaderId")
+                        .IsUnique()
+                        .HasFilter("\"ReaderId\" IS NOT NULL");
 
                     b.ToTable("AspNetUsers", "SYSTEM");
                 });
@@ -336,6 +350,10 @@ namespace marsian_library.Migrations
                         .HasColumnType("NUMBER(10)");
 
                     OraclePropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Guid")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.Property<string>("Isbn")
                         .IsRequired()
@@ -744,6 +762,21 @@ namespace marsian_library.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("marsian_library.Models.ApplicationUser", b =>
+                {
+                    b.HasOne("marsian_library.Models.Emp", "Emp")
+                        .WithOne()
+                        .HasForeignKey("marsian_library.Models.ApplicationUser", "EmpId");
+
+                    b.HasOne("marsian_library.Models.Reader", "Reader")
+                        .WithOne()
+                        .HasForeignKey("marsian_library.Models.ApplicationUser", "ReaderId");
+
+                    b.Navigation("Emp");
+
+                    b.Navigation("Reader");
                 });
 
             modelBuilder.Entity("marsian_library.Models.Book", b =>

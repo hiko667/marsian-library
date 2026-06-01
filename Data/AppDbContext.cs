@@ -37,7 +37,7 @@ namespace marsian_library.Data
                 .HasOne(d => d.Director)
                 .WithMany() // director is a worker too, doesn't need to have a collection of depts he oversees
                 .HasForeignKey(d => d.DirectorId)
-                .OnDelete(DeleteBehavior.Restrict); // do not delete emps when deleting dept
+                .OnDelete(DeleteBehavior.Restrict); 
 
             builder.Entity<Emp>()
                 .HasOne(e => e.Dept)
