@@ -8,37 +8,151 @@
 
 <h4>Book</h4>
 <hr />
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
+    <div class="col-md-6">
+        <form asp-action="Edit" id="editForm">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
+
             <div class="form-group">
                 <label asp-for="Title" class="control-label"></label>
                 <input asp-for="Title" class="form-control" />
                 <span asp-validation-for="Title" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="Isbn" class="control-label"></label>
                 <input asp-for="Isbn" class="form-control" />
                 <span asp-validation-for="Isbn" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="PublisherId" class="control-label"></label>
-                <select asp-for="PublisherId" class="form-control" asp-items="ViewBag.PublisherId"></select>
+                <select asp-for="PublisherId" class="form-control" asp-items="ViewBag.PublisherId">
+                    <option value="">-- Select Publisher --</option>
+                </select>
                 <span asp-validation-for="PublisherId" class="text-danger"></span>
             </div>
+
             <div class="form-group">
+                <label class="control-label">Authors</label>
+                <select name="selectedAuthors" class="form-control" asp-items="ViewBag.Authors" multiple></select>
+                <small class="form-text text-muted">Hold Ctrl to select multiple authors</small>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Genres</label>
+                <select name="selectedGenres" class="form-control" asp-items="ViewBag.Genres" multiple></select>
+                <small class="form-text text-muted">Hold Ctrl to select multiple genres</small>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Languages</label>
+                <select name="selectedLanguages" class="form-control" asp-items="ViewBag.Languages" multiple></select>
+                <small class="form-text text-muted">Hold Ctrl to select multiple languages</small>
+            </div>
+
+            <!-- Tabela departamentów z ilością egzemplarzy -->
+            <div class="form-group mt-4">
+                <label class="control-label fw-bold">Department Copies Management</label>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm" id="departmentsTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Department ID</th>
+                                <th>Address</th>
+                                <th>Current Copies</th>
+                                <th>Add New Copies</th>
+                                <th>Remove Copies</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var departments = ViewBag.Departments as List<marsian_library.Models.Dept>;
+                                var existingCopies = ViewBag.ExistingCopies as Dictionary<int, int>;
+                                
+                                if (departments != null && departments.Any())
+                                {
+                                    foreach (var dept in departments)
+                                    {
+                                        int currentCount = existingCopies != null && existingCopies.ContainsKey(dept.Id) 
+                                            ? existingCopies[dept.Id] : 0;
+                                        <tr>
+                                            <td>@dept.Id</td>
+                                            <td>@(dept.Address?.FullAddress ?? "No address")</td>
+                                            <td>
+                                                <span class="badge bg-primary">@currentCount</span>
+                                            </td>
+                                            <td>
+                                                <input type="number" name="addCopies[@dept.Id]" 
+                                                       class="form-control form-control-sm" 
+                                                       min="0" max="100" value="0" style="width: 80px;" />
+                                            </td>
+                                            <td>
+                                                <input type="number" name="removeCopies[@dept.Id]" 
+                                                       class="form-control form-control-sm" 
+                                                       min="0" max="@currentCount" value="0" style="width: 80px;" />
+                                             </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">No departments found.</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <small class="form-text text-muted">Add or remove copies of this book in each department.</small>
+            </div>
+
+            <div class="form-group mt-3">
                 <input type="submit" value="Save" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        // Walidacja przed wysłaniem formularza
+        document.getElementById('editForm').addEventListener('submit', function(e) {
+            let hasChanges = false;
+            
+            // Sprawdź czy dodajemy lub usuwamy jakieś kopie
+            const addInputs = document.querySelectorAll('input[name^="addCopies"]');
+            const removeInputs = document.querySelectorAll('input[name^="removeCopies"]');
+            
+            addInputs.forEach(input => {
+                if (parseInt(input.value) > 0) hasChanges = true;
+            });
+            
+            removeInputs.forEach(input => {
+                if (parseInt(input.value) > 0) hasChanges = true;
+            });
+            
+            if (!hasChanges) {
+                // Potwierdzenie - czy na pewno chcesz zapisać bez zmian?
+                if (!confirm('No changes to copies. Do you want to save the book information anyway?')) {
+                    e.preventDefault();
+                }
+            }
+        });
+    </script>
 }

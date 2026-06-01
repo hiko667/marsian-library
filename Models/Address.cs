@@ -1,5 +1,5 @@
-using System.ComponentModel.DataAnnotations;        // Dla [Required] i [MaxLength]
-using System.ComponentModel.DataAnnotations.Schema; // Dla [Column]
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace marsian_library.Models;
 
@@ -29,4 +29,7 @@ public class Address
     public ICollection<Dept> Depts { get; set; } = new List<Dept>();
     public ICollection<Emp> Emps { get; set; } = new List<Emp>();
     public ICollection<Reader> Readers { get; set; } = new List<Reader>();
+
+    [NotMapped]
+    public string FullAddress => $"{Street} {Building}{(string.IsNullOrEmpty(Apartment) ? "" : $"/{Apartment}")}, {ZipCode} {City}";
 }
