@@ -9,9 +9,17 @@
 <h4>Book</h4>
 <hr />
 
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
 <div class="row">
     <div class="col-md-6">
-        <form asp-action="Create">
+        <form asp-action="Create" id="bookForm">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="form-group">
@@ -52,6 +60,55 @@
                 <small class="form-text text-muted">Hold Ctrl to select multiple languages</small>
             </div>
 
+            <!-- Tabela departamentów z ilością egzemplarzy -->
+            <div class="form-group mt-4">
+                <label class="control-label fw-bold">Department Copies</label>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm" id="departmentsTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Select</th>
+                                <th>Department ID</th>
+                                <th>Address</th>
+                                <th>Number of Copies</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var departments = ViewBag.Departments as List<marsian_library.Models.Dept>;
+                                if (departments != null && departments.Any())
+                                {
+                                    for (int i = 0; i < departments.Count; i++)
+                                    {
+                                        var dept = departments[i];
+                                        <tr>
+                                            <td class="text-center">
+                                                <input type="checkbox" name="departmentCopies[@i].DeptId" 
+                                                       value="@dept.Id" class="dept-checkbox" />
+                                            </td>
+                                            <td>@dept.Id</td>
+                                            <td>@(dept.Address?.FullAddress ?? "No address")</td>
+                                            <td>
+                                                <input type="number" name="departmentCopies[@i].NumberOfCopies" 
+                                                       class="form-control form-control-sm copies-input" 
+                                                       min="0" max="100" value="0" style="width: 100px;" disabled />
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted">No departments found. Please create a department first.</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <small class="form-text text-muted">Select departments and specify the number of copies for each.</small>
+            </div>
+
             <div class="form-group mt-3">
                 <input type="submit" value="Create" class="btn btn-primary" />
                 <a asp-action="Index" class="btn btn-secondary">Back to List</a>
@@ -64,4 +121,46 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        // Aktywuj/disable pole liczby kopii przy zaznaczeniu checkboxa
+        const checkboxes = document.querySelectorAll('.dept-checkbox');
+        const copiesInputs = document.querySelectorAll('.copies-input');
+
+        checkboxes.forEach((checkbox, index) => {
+            checkbox.addEventListener('change', function() {
+                const copiesInput = copiesInputs[index];
+                if (this.checked) {
+                    copiesInput.disabled = false;
+                    if (copiesInput.value === '0') {
+                        copiesInput.value = '1';
+                    }
+                } else {
+                    copiesInput.disabled = true;
+                    copiesInput.value = '0';
+                }
+            });
+        });
+
+        // Walidacja przed wysłaniem formularza
+        document.getElementById('bookForm').addEventListener('submit', function(e) {
+            let hasSelected = false;
+            let totalCopies = 0;
+            
+            checkboxes.forEach((checkbox, index) => {
+                if (checkbox.checked) {
+                    hasSelected = true;
+                    const copiesValue = parseInt(copiesInputs[index].value);
+                    totalCopies += copiesValue;
+                }
+            });
+            
+            if (!hasSelected) {
+                e.preventDefault();
+                alert('Please select at least one department and specify the number of copies.');
+            } else if (totalCopies === 0) {
+                e.preventDefault();
+                alert('Please specify at least one copy in selected departments.');
+            }
+        });
+    </script>
 }
