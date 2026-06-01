@@ -1,5 +1,5 @@
-using System.ComponentModel.DataAnnotations;        // Dla [Required] i [MaxLength]
-using System.ComponentModel.DataAnnotations.Schema; // Dla [Column]
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace marsian_library.Models;
 
@@ -29,4 +29,7 @@ public class Emp
     [Required]
     [MaxLength(50)]
     public string LastName { get; set; } = string.Empty;
+
+    [NotMapped]
+    public string FullName => $"{FirstName} {LastName}";
 }
