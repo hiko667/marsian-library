@@ -58,7 +58,7 @@ public class BookController : Controller
     // GET: Book/Create
 
     [Authorize(Roles = "Employee")]
-    public IActionResult Create()
+    public async Task<IActionResult> Create()
 
     {
         ViewData["PublisherId"] = new SelectList(_context.Publishers, "Id", "Name");
