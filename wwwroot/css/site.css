@@ -1,5 +1,6 @@
 html {
   font-size: 14px;
+  height: 100%;
 }
 
 @media (min-width: 768px) {
@@ -15,10 +16,14 @@ html {
 html {
   position: relative;
   min-height: 100%;
+
 }
 
 body {
+  height: 100%;
   margin-bottom: 60px;
+  display: flex;
+  flex-direction: column;
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
@@ -36,4 +41,7 @@ body {
 
 .navbar-mars .nav-link, .navbar-mars .navbar-brand {
     color: white !important;
+}
+.flex-grow-1 {
+    flex-grow: 1;
 }

@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark" id="theme-html">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -30,12 +30,15 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="BookCrud">Books</a>
                         </li>
                     </ul>
+                    <div class="d-flex align-items-center me-2">
+                        <button id="theme-toggle" class="btn light btn-sm">Light Mode</button>
+                    </div>
                     <partial name="_LoginPartial" />
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
+    <div class="container flex-grow-1">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
