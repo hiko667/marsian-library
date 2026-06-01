@@ -32,17 +32,22 @@ builder.Services.AddScoped<IBookService, BookService>();
 
 var app = builder.Build();
 
+//seeding
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
         await DbInitializer.SeedRolesAsync(services);
+        await DbInitializer.SeedAdressAsync(services);
+        await DbInitializer.SeedJobAsync(services);
+        await DbInitializer.SeedAdminAsync(services);
+        await DbInitializer.SeedDepartmentsAsync(services);
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Role error");
+        logger.LogError(ex, "Seeding failed");
     }
 }
 
