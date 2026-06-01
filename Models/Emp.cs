@@ -12,9 +12,8 @@ public class Emp
     public int AddressId { get; set; }
     public virtual Address? Address { get; set; }
 
-    [Required]
     [ForeignKey("DeptId")]
-    public int DeptId { get; set; }
+    public int? DeptId { get; set; }
     public virtual Dept? Dept { get; set; }
 
     [Required]
