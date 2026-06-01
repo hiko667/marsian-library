@@ -47,12 +47,12 @@ body {
     flex-grow: 1;
 }
 
-.no-transition {
+/* .no-transition {
     transition: none !important;
 }
 .no-transition * {
     transition: none !important;
-}
+} */
 body, 
 header, 
 nav, 
