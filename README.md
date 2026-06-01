@@ -27,9 +27,5 @@ Dodatkowo:
 8. Aplikacja obsługuje załączniki (w formularzach oraz umożliwia pobieranie plików) 
 9. Aplikacja Generuje dokumenty (np.: pdf, excel, word) - można wybrać 1 typ dokumentu – **excel z listą wypożyczeń czytelnika?**
 
-
-
-
-
-
-![Logo](https://gifdb.com/images/high/rickroll-rick-astley-get-rickrolled-format-t2h9jutd39kd7mvr.webp)
+Admin login: beliasariuscawl@mechanicus.com
+Admin hasło: ArchmagosDominus123
