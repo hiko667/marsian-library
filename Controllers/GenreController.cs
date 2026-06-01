@@ -45,6 +45,7 @@ namespace marsian_library.Controllers
         }
 
         // GET: Genre/Create
+        [Authorize(Roles = "Employee")]
         public IActionResult Create()
         {
             return View();
@@ -55,6 +56,7 @@ namespace marsian_library.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Employee")]
         [Authorize(Roles = "Employee")]
         public async Task<IActionResult> Create([Bind("Id,Name,ChildrenFriendly")] Genre genre)
         {
