@@ -80,8 +80,8 @@ public class BookController : Controller
     [ValidateAntiForgeryToken]
 
     [Authorize(Roles = "Employee")]
-    public async Task<IActionResult> Create(Book book, int[]? selectedAuthors, int[]? selectedGenres, int[]? selectedLanguages)
-
+    public async Task<IActionResult> Create(Book book, int[]? selectedAuthors, int[]? selectedGenres,
+        int[]? selectedLanguages, List<DeptCopyInput> departmentCopies)
     {
         // Usuń walidację dla kolekcji
         ModelState.Remove("Authors");
