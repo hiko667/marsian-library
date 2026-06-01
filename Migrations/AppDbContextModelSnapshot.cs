@@ -348,6 +348,10 @@ namespace marsian_library.Migrations
 
                     OraclePropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Guid")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR2(2000)");
+
                     b.Property<string>("Isbn")
                         .IsRequired()
                         .HasMaxLength(13)

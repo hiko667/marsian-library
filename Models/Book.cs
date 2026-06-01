@@ -17,6 +17,9 @@ public class Book
     [RegularExpression(@"^[0-9]+$", ErrorMessage = "ISBN może zawierać tylko cyfry")]
     public string Isbn { get; set; } = string.Empty;
 
+    [Required]
+    public string Guid { get; set; } = System.Guid.NewGuid().ToString();
+
 
     [Required]
     [ForeignKey("PublisherId")]
