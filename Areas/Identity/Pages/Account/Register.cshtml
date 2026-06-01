@@ -9,7 +9,6 @@
 <div class="row">
     <div class="col-md-4">
         <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-            <h2>Nowe Konto.</h2>
             <hr />
             <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
             <div class="form-floating mb-3">
@@ -19,79 +18,79 @@
             </div>
             <div class="form-floating mb-3">
                 <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.Password">Hasło</label>
+                <label asp-for="Input.Password">Password</label>
                 <span asp-validation-for="Input.Password" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
                 <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.ConfirmPassword">Potwierdź Hasło</label>
+                <label asp-for="Input.ConfirmPassword">Confirm Password</label>
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
                 <select asp-for="Input.Role" class="form-control" id="roleSelect">
-                    <option value="">-- Wybierz rolę --</option>
-                    <option value="Reader">Czytelnik</option>
-                    <option value="Employee">Pracownik</option>
+                    <option value="">-- Pick Your Role --</option>
+                    <option value="Reader">Reader</option>
+                    <option value="Employee">Employee</option>
                 </select>
-                <label asp-for="Input.Role">Rola</label>
+                <label asp-for="Input.Role">Role</label>
             </div>
 
             <div class="form-floating mb-3">
                 <input asp-for="Input.FirstName" class="form-control" />
-                <label asp-for="Input.FirstName">Imię</label>
+                <label asp-for="Input.FirstName">First Name</label>
             </div>
             <div class="form-floating mb-3">
                 <input asp-for="Input.LastName" class="form-control" />
-                <label asp-for="Input.LastName">Nazwisko</label>
+                <label asp-for="Input.LastName">Last Name</label>
             </div>
             <div id="employeeFields" style="display:none;">
                 <div class="form-floating mb-3">
                     <select asp-for="Input.DeptId" class="form-control" asp-items="ViewBag.Depts"></select>
-                    <label asp-for="Input.DeptId">Departament</label>
+                    <label asp-for="Input.DeptId">Department</label>
                 </div>
                 <div class="form-floating mb-3">
                     <select asp-for="Input.DeptId" class="form-control" asp-items="ViewBag.Depts">
-                        <option value="">-- Wybierz departament --</option>
+                        <option value="">-- Pick Department --</option>
                     </select>
                     <label asp-for="Input.DeptId"></label>
                 </div>
                 <div class="form-floating mb-3">
                     <select asp-for="Input.JobId" class="form-control" asp-items="ViewBag.Jobs">
-                        <option value="">-- Wybierz stanowisko --</option>
+                        <option value="">-- Pick Job --</option>
                     </select>
                     <label asp-for="Input.JobId"></label>
                 </div>
             </div>  
-            <h4>Dane adresowe</h4>
+            <h4>Adress Data</h4>
                 <hr />
                 <div class="form-floating mb-3">
                     <input asp-for="Input.Street" class="form-control" />
-                    <label asp-for="Input.Street">Ulica</label>
+                    <label asp-for="Input.Street">Street</label>
                 </div>
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3">
                             <input asp-for="Input.City" class="form-control" />
-                            <label asp-for="Input.City">Miasto</label>
+                            <label asp-for="Input.City">City</label>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3">
                             <input asp-for="Input.ZipCode" class="form-control" />
-                            <label asp-for="Input.ZipCode">Kod pocztowy</label>
+                            <label asp-for="Input.ZipCode">Zip Code</label>
                         </div>
                     </div>
-                    <<div class="col-md-6">
+                    <div class="col-md-6">
                         <div class="form-floating mb-3">
                             <input asp-for="Input.Building" class="form-control" />
-                            <label asp-for="Input.Building">Numer Budynku</label>
+                            <label asp-for="Input.Building">Building Number</label>
                             <span asp-validation-for="Input.Building" class="text-danger"></span>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3">
                             <input asp-for="Input.Apartment" class="form-control" />
-                            <label asp-for="Input.Apartment">Numer Mieszkania</label>
+                            <label asp-for="Input.Apartment">Apartment Number</label>
                             <span asp-validation-for="Input.Apartment" class="text-danger"></span>
                         </div>
                     </div>

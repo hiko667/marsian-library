@@ -42,7 +42,7 @@ using (var scope = app.Services.CreateScope())
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Wystąpił błąd podczas dodawania ról do bazy. Wina Stasia!");
+        logger.LogError(ex, "Role error");
     }
 }
 
