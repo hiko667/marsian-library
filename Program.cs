@@ -28,6 +28,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => {
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+builder.Services.AddHttpClient<marsian_library.Services.WeatherRaportService>();
 builder.Services.AddScoped<IBookService, BookService>();
 
 var app = builder.Build();
