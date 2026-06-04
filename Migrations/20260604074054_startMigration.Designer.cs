@@ -12,8 +12,8 @@ using marsian_library.Data;
 namespace marsian_library.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260512182517_users")]
-    partial class users
+    [Migration("20260604074054_startMigration")]
+    partial class startMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -351,6 +351,10 @@ namespace marsian_library.Migrations
 
                     OraclePropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Guid")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR2(2000)");
+
                     b.Property<string>("Isbn")
                         .IsRequired()
                         .HasMaxLength(13)
@@ -493,7 +497,7 @@ namespace marsian_library.Migrations
                     b.Property<int>("AddressId")
                         .HasColumnType("NUMBER(10)");
 
-                    b.Property<int>("DirectorId")
+                    b.Property<int?>("DirectorId")
                         .HasColumnType("NUMBER(10)");
 
                     b.HasKey("Id");
@@ -516,7 +520,7 @@ namespace marsian_library.Migrations
                     b.Property<int>("AddressId")
                         .HasColumnType("NUMBER(10)");
 
-                    b.Property<int>("DeptId")
+                    b.Property<int?>("DeptId")
                         .HasColumnType("NUMBER(10)");
 
                     b.Property<string>("FirstName")
@@ -900,8 +904,7 @@ namespace marsian_library.Migrations
                     b.HasOne("marsian_library.Models.Emp", "Director")
                         .WithMany()
                         .HasForeignKey("DirectorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Address");
 
@@ -919,8 +922,7 @@ namespace marsian_library.Migrations
                     b.HasOne("marsian_library.Models.Dept", "Dept")
                         .WithMany("Emps")
                         .HasForeignKey("DeptId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("marsian_library.Models.Job", "Job")
                         .WithMany("Emps")

@@ -38,16 +38,12 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     try
     {
-        await DbInitializer.SeedRolesAsync(services);
-        await DbInitializer.SeedAdressAsync(services);
-        await DbInitializer.SeedJobAsync(services);
-        await DbInitializer.SeedAdminAsync(services);
-        await DbInitializer.SeedDepartmentsAsync(services);
+        await DbInitializer.SeedAllAsync(services);
+        Console.WriteLine("Database seeded successfully!");
     }
     catch (Exception ex)
     {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Seeding failed");
+        Console.WriteLine($"Error seeding database: {ex.Message}");
     }
 }
 
