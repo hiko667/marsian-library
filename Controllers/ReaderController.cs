@@ -83,6 +83,88 @@ namespace marsian_library.Controllers
                 return NotFound();
             }
 
+#pragma warning disable CS8602
+            // Fetch current borrows
+            var currentBorrows = await _context.Borrows
+                .Include(b => b.Copy)
+                    .ThenInclude(c => c.Book)
+                .Include(b => b.Copy)
+                    .ThenInclude(c => c.Book)
+                        .ThenInclude(b => b.Authors)
+                .Include(b => b.Copy)
+                    .ThenInclude(c => c.Dept)
+                .Where(b => b.ReaderId == reader.Id && b.ReturnDate == null)
+                .OrderBy(b => b.ExpectedReturnDate)
+                .Select(b => new BorrowInfo
+                {
+                    BorrowId = b.Id,
+                    BookTitle = b.Copy!.Book!.Title,
+                    Author = b.Copy.Book.Authors.FirstOrDefault() != null ? b.Copy.Book.Authors.FirstOrDefault()!.FullName : "Unknown",
+                    CopyId = b.CopyId,
+                    DeptId = b.Copy.Dept != null ? b.Copy.Dept.Id : 0,
+                    BorrowDate = b.BorrowDate,
+                    ExpectedReturnDate = b.ExpectedReturnDate,
+                    ReturnDate = b.ReturnDate,
+                    TimesExtended = b.TimesExtended,
+                    ExtensionsRemaining = 3 - b.TimesExtended,
+                    CanExtend = b.TimesExtended < 3
+                })
+                .ToListAsync();
+#pragma warning restore CS8602
+
+            ViewBag.CurrentBorrows = currentBorrows;
+
+            return View(reader);
+        }
+
+        // GET: Reader/BorrowHistory/5
+        [Authorize(Roles = "Employee, Admin")]
+        public async Task<IActionResult> BorrowHistory(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var reader = await _context.Readers
+                .Include(r => r.Address)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (reader == null)
+            {
+                return NotFound();
+            }
+
+#pragma warning disable CS8602
+            var borrowHistory = await _context.Borrows
+                .Include(b => b.Copy)
+                    .ThenInclude(c => c.Book)
+                .Include(b => b.Copy)
+                    .ThenInclude(c => c.Book)
+                        .ThenInclude(b => b.Authors)
+                .Include(b => b.Copy)
+                    .ThenInclude(c => c.Dept)
+                .Where(b => b.ReaderId == reader.Id && b.ReturnDate != null)
+                .OrderByDescending(b => b.BorrowDate)
+                .Select(b => new BorrowInfo
+                {
+                    BorrowId = b.Id,
+                    BookTitle = b.Copy!.Book!.Title,
+                    Author = b.Copy.Book.Authors.FirstOrDefault() != null ? b.Copy.Book.Authors.FirstOrDefault()!.FullName : "Unknown",
+                    CopyId = b.CopyId,
+                    DeptId = b.Copy.Dept != null ? b.Copy.Dept.Id : 0,
+                    BorrowDate = b.BorrowDate,
+                    ExpectedReturnDate = b.ExpectedReturnDate,
+                    ReturnDate = b.ReturnDate,
+                    TimesExtended = b.TimesExtended,
+                    ExtensionsRemaining = 3 - b.TimesExtended,
+                    CanExtend = b.TimesExtended < 3
+                })
+                .ToListAsync();
+#pragma warning restore CS8602
+
+            ViewBag.Reader = reader;
+            ViewBag.BorrowHistory = borrowHistory;
+
             return View(reader);
         }
 
@@ -207,5 +289,20 @@ namespace marsian_library.Controllers
         {
             return _context.Readers.Any(e => e.Id == id);
         }
+    }
+
+    public class BorrowInfo
+    {
+        public int BorrowId { get; set; }
+        public string BookTitle { get; set; } = string.Empty;
+        public string Author { get; set; } = string.Empty;
+        public int CopyId { get; set; }
+        public int DeptId { get; set; }
+        public DateTime BorrowDate { get; set; }
+        public DateTime ExpectedReturnDate { get; set; }
+        public DateTime? ReturnDate { get; set; }
+        public int TimesExtended { get; set; }
+        public int ExtensionsRemaining { get; set; }
+        public bool CanExtend { get; set; }
     }
 }

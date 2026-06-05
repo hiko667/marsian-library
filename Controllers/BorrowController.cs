@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -145,6 +146,48 @@ namespace marsian_library.Controllers
             }
 
             return View(borrow);
+        }
+
+        // POST: Borrow/Return/5
+        [Authorize(Roles = "Employee, Admin")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Return(int id, int? readerId)
+        {
+            var borrow = await _context.Borrows
+                .Include(b => b.Copy)
+                .FirstOrDefaultAsync(b => b.Id == id);
+            if (borrow == null)
+            {
+                return NotFound();
+            }
+
+            if (borrow.ReturnDate == null)
+            {
+                borrow.ReturnDate = DateTime.Now;
+
+                var availableState = await _context.States.FirstOrDefaultAsync(s => s.Name == "Available");
+                if (availableState == null)
+                {
+                    throw new InvalidOperationException("State 'Available' not found in database. Please ensure it exists.");
+                }
+
+                if (borrow.Copy != null)
+                {
+                    borrow.Copy.StateId = availableState.Id;
+                    _context.Copies.Update(borrow.Copy);
+                }
+
+                _context.Borrows.Update(borrow);
+                await _context.SaveChangesAsync();
+            }
+
+            if (readerId.HasValue)
+            {
+                return RedirectToAction("Details", "Reader", new { id = readerId.Value });
+            }
+
+            return RedirectToAction(nameof(Index));
         }
 
         // POST: Borrow/Delete/5

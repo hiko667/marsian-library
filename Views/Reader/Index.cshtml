@@ -122,13 +122,3 @@ else
     }
 }
 
-@section Scripts {
-    <script>
-       
-        // Zapisz stan panelu przed odświeżeniem
-        window.addEventListener('beforeunload', function() {
-            const isVisible = filtersPanel.style.display === 'block';
-            sessionStorage.setItem('filtersPanelVisible', isVisible);
-        });
-    </script>
-}

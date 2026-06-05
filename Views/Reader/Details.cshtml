@@ -14,7 +14,14 @@
             @Html.DisplayNameFor(model => model.Address)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Address.Building)
+            @if (Model.Address != null)
+            {
+                @Model.Address.Building
+            }
+            else
+            {
+                <span class="text-muted">No address</span>
+            }
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.FirstName)
@@ -30,6 +37,79 @@
         </dd>
     </dl>
 </div>
+
+<!-- Current Borrowed Books Section -->
+<div class="row mt-5">
+    <div class="col-md-12">
+        <div class="card mb-4">
+            <div class="card-header">
+                <strong>Current Borrowed Books</strong>
+            </div>
+            <div class="card-body">
+                @{
+                    var currentBorrows = ViewBag.CurrentBorrows as List<marsian_library.Controllers.BorrowInfo>;
+                }
+                @if (currentBorrows != null && currentBorrows.Any())
+                {
+                    <table class="table table-sm table-striped">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>Copy ID</th>
+                                <th>Dept ID</th>    
+                                <th>Borrowed</th>
+                                <th>Due</th>
+                        <th>Extensions</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var borrow in currentBorrows)
+                    {
+                        <tr>
+                            <td>@borrow.BookTitle</td>
+                            <td>@borrow.Author</td>
+                            <td>@borrow.CopyId</td>
+                            <td>@borrow.DeptId</td>
+                            <td>@borrow.BorrowDate.ToShortDateString()</td>
+                            <td>@borrow.ExpectedReturnDate.ToShortDateString()</td>
+                            <td>
+                                @if (borrow.CanExtend)
+                                {
+                                    <span class="badge badge-secondary">@borrow.ExtensionsRemaining extension@(borrow.ExtensionsRemaining == 1 ? "" : "s") left</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-danger">No extensions left</span>
+                                }
+                            </td>
+                            <td>
+                                <form asp-controller="Borrow" asp-action="Return" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@borrow.BorrowId" />
+                                    <input type="hidden" name="readerId" value="@Model.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-success">Return</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">No currently borrowed books.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mb-4">
+    <a asp-action="BorrowHistory" asp-route-id="@Model?.Id" class="btn btn-primary">View borrow history</a>
+</div>
+
 <div>
     <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>

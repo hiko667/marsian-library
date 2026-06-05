@@ -118,7 +118,8 @@
                                     var borrowers = ViewBag.CopyBorrowers as Dictionary<int, marsian_library.Models.Reader>;
                                     if (borrowers != null && borrowers.TryGetValue(copy.Id, out var borrower) && borrower != null)
                                     {
-                                        <a asp-controller="Reader" asp-action="Details" asp-route-id="@borrower.Id" class="btn btn-sm btn-secondary">
+                                        <a asp-controller="Reader" asp-action="Details" asp-route-id="@borrower.Id"
+                                           class="btn btn-sm btn-secondary">
                                             Borrowed by @($"{borrower.FirstName} {borrower.LastName}")
                                         </a>
                                     }
@@ -143,5 +144,11 @@
 
 <div class="mt-3">
     <a asp-action="Index" class="btn btn-secondary">Back to Search</a>
-    <a asp-controller="Book" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit Book</a>
+
+    <!-- TUTAJ TYLKO DLA BIBLIOTEKARZY -->
+    @if (User.Identity != null && User.Identity.IsAuthenticated && (User.IsInRole("Employee") || User.IsInRole("Admin")))
+    {
+        <a asp-controller="Book" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-sm btn-warning">Edit book</a>
+        <a asp-controller="Book" asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-sm btn-danger">Delete book</a>
+    }
 </div>

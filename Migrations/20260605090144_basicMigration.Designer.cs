@@ -12,8 +12,8 @@ using marsian_library.Data;
 namespace marsian_library.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260604074054_startMigration")]
-    partial class startMigration
+    [Migration("20260605090144_basicMigration")]
+    partial class basicMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

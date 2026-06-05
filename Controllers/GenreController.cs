@@ -58,7 +58,7 @@ namespace marsian_library.Controllers
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Employee,Admin")]
         [Authorize(Roles = "Employee,Admin")]
-        public async Task<IActionResult> Create([Bind("Id,Name,ChildrenFriendly")] Genre genre)
+        public async Task<IActionResult> Create([Bind("Id,Name")] Genre genre)
         {
             if (ModelState.IsValid)
             {
@@ -92,7 +92,7 @@ namespace marsian_library.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Employee,Admin")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,ChildrenFriendly")] Genre genre)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Genre genre)
         {
             if (id != genre.Id)
             {

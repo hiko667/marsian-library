@@ -38,12 +38,16 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     try
     {
-        await DbInitializer.SeedAllAsync(services);
-        Console.WriteLine("Database seeded successfully!");
+        // Opcja 1: Normalne seedowanie (tylko jeśli dane nie istnieją)
+        //await DbInitializer.SeedAllAsync(services);
+        
+        // Opcja 2: Reset i reseed (usuwa wszystkie dane i dodaje od nowa)
+        // await DbInitializer.ResetAndReseedAsync(services);
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Error seeding database: {ex.Message}");
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while seeding the database.");
     }
 }
 

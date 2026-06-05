@@ -1,0 +1,71 @@
+@model marsian_library.Models.Reader
+
+@{
+    ViewData["Title"] = "Borrow History";
+}
+
+<h1>Borrow History for @Model.FirstName @Model.LastName</h1>
+
+<div class="mb-4">
+    <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary">Back to Reader Details</a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <strong>Borrowing History</strong>
+    </div>
+    <div class="card-body">
+        @{
+            var borrowHistory = ViewBag.BorrowHistory as List<marsian_library.Controllers.BorrowInfo>;
+        }
+        @if (borrowHistory != null && borrowHistory.Any())
+        {
+            <table class="table table-sm table-striped">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Copy ID</th>
+                        <th>Dept ID</th>
+                        <th>Borrowed</th>
+                        <th>Due</th>
+                        <th>Returned</th>
+                        <th>Times Extended</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var borrow in borrowHistory)
+                    {
+                        <tr>
+                            <td>@borrow.BookTitle</td>
+                            <td>@borrow.Author</td>
+                            <td>@borrow.CopyId</td>
+                            <td>@borrow.DeptId</td>
+                            <td>@borrow.BorrowDate.ToShortDateString()</td>
+                            <td>@borrow.ExpectedReturnDate.ToShortDateString()</td>
+                            <td>
+                                @if (borrow.ReturnDate.HasValue)
+                                {
+                                    @borrow.ReturnDate.Value.ToShortDateString()
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td>@borrow.TimesExtended</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p class="text-muted mb-0">No borrowing history available for this reader.</p>
+        }
+    </div>
+</div>
+
+<div>
+    <a asp-action="Details" asp-route-id="@Model.Id">Back to Reader Details</a>
+</div>

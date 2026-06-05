@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace marsian_library.Migrations
 {
     /// <inheritdoc />
-    public partial class startMigration : Migration
+    public partial class basicMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

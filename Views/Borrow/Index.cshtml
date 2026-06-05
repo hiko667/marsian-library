@@ -30,7 +30,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.TimesExtended)
             </th>
-            <th></th>
+            <th>Action</th>
         </tr>
     </thead>
     <tbody>
@@ -58,6 +58,14 @@
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                @if (item.ReturnDate == null)
+                {
+                    <form asp-action="Return" method="post" class="d-inline ms-2">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@item.Id" />
+                        <button type="submit" class="btn btn-sm btn-outline-success">Return</button>
+                    </form>
+                }
             </td>
         </tr>
 }

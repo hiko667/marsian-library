@@ -8,6 +8,13 @@
 }
 
 <h1>Book Search</h1>
+@if (User.Identity != null && User.Identity.IsAuthenticated && (User.IsInRole("Employee") || User.IsInRole("Admin")))
+{
+    <p>
+        <a asp-action="Create">Add new book</a>
+    </p>
+}
+
 
 <!-- Formularz wyszukiwania i filtrów -->
 <form asp-action="Index" method="get" id="filterForm">
@@ -43,8 +50,8 @@
                 <!-- Filtr gatunków -->
                 <div class="col-md-4 mb-3">
                     <label class="form-label fw-bold">Genres</label>
-                    <select name="selectedGenres" class="form-control" 
-                            asp-items="ViewBag.Genres" multiple="multiple" size="5">
+                    <select name="selectedGenres" class="form-control" asp-items="ViewBag.Genres" multiple="multiple"
+                            size="5">
                     </select>
                     <small class="form-text text-muted">Hold Ctrl to select multiple</small>
                 </div>
@@ -52,8 +59,8 @@
                 <!-- Filtr języków -->
                 <div class="col-md-4 mb-3">
                     <label class="form-label fw-bold">Languages</label>
-                    <select name="selectedLanguages" class="form-control" 
-                            asp-items="ViewBag.Languages" multiple="multiple" size="5">
+                    <select name="selectedLanguages" class="form-control" asp-items="ViewBag.Languages"
+                            multiple="multiple" size="5">
                     </select>
                     <small class="form-text text-muted">Hold Ctrl to select multiple</small>
                 </div>
@@ -61,8 +68,8 @@
                 <!-- Filtr wydawców -->
                 <div class="col-md-4 mb-3">
                     <label class="form-label fw-bold">Publishers</label>
-                    <select name="selectedPublishers" class="form-control" 
-                            asp-items="ViewBag.Publishers" multiple="multiple" size="5">
+                    <select name="selectedPublishers" class="form-control" asp-items="ViewBag.Publishers"
+                            multiple="multiple" size="5">
                     </select>
                     <small class="form-text text-muted">Hold Ctrl to select multiple</small>
                 </div>
@@ -129,7 +136,9 @@ else
             <div class="col-md-6 col-lg-4 mb-4">
                 <div class="card h-100 shadow-sm">
                     <div class="card-body">
-                        <h5 class="card-title">@book.Title</h5>
+                        <h5 class="card-title">
+                            <a asp-action="Details" asp-route-id="@book.Id">@book.Title</a>
+                        </h5>
                         <h6 class="card-subtitle mb-2 text-muted">
                             @(book.Publisher?.Name ?? "Unknown Publisher")
                         </h6>
@@ -143,19 +152,11 @@ else
                             @(book.Genres != null && book.Genres.Any()
                                 ? string.Join(", ", book.Genres.Select(g => g.Name))
                                 : "-")<br />
-                            <strong>Langdouages:</strong>
+                            <strong>Languages:</strong>
                             @(book.Languages != null && book.Languages.Any()
                                 ? string.Join(", ", book.Languages.Select(l => l.Name))
                                 : "-")
                         </p>
-                    </div>
-                    <div class="card-footer bg-transparent">
-                        <a asp-action="Details" asp-route-id="@book.Id" class="btn btn-sm btn-info">Details</a>
-                        <!-- TUTAJ TYLKO DLA BIBLIOTEKARZY -->
-                        @if (User.Identity != null && User.Identity.IsAuthenticated && (User.IsInRole("Employee") || User.IsInRole("Admin")))
-                        {
-                            <a asp-controller="Book" asp-action="Edit" asp-route-id="@book.Id" class="btn btn-sm btn-warning">Edit</a>
-                        }
                     </div>
                 </div>
             </div>
@@ -208,8 +209,8 @@ else
         // Przełączanie widoczności panelu filtrów
         const toggleBtn = document.getElementById('toggleFiltersBtn');
         const filtersPanel = document.getElementById('filtersPanel');
-        
-        toggleBtn.addEventListener('click', function() {
+
+        toggleBtn.addEventListener('click', function () {
             if (filtersPanel.style.display === 'none') {
                 filtersPanel.style.display = 'block';
                 toggleBtn.innerHTML = '<i class="fas fa-filter"></i> Hide Filters';
@@ -226,10 +227,10 @@ else
         // Przycisk czyszczący filtry (resetuje tylko selecty, nie przesyła formularza)
         const clearFiltersBtn = document.getElementById('clearFiltersBtn');
         if (clearFiltersBtn) {
-            clearFiltersBtn.addEventListener('click', function() {
+            clearFiltersBtn.addEventListener('click', function () {
                 const selects = document.querySelectorAll('#filtersPanel select[multiple]');
                 selects.forEach(select => {
-                    for(let i = 0; i < select.options.length; i++) {
+                    for (let i = 0; i < select.options.length; i++) {
                         select.options[i].selected = false;
                     }
                 });
@@ -237,7 +238,7 @@ else
         }
 
         // Zapamiętanie stanu panelu filtrów po odświeżeniu strony
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const panelState = sessionStorage.getItem('filtersPanelVisible');
             if (panelState === 'true') {
                 filtersPanel.style.display = 'block';
@@ -251,9 +252,9 @@ else
                 toggleBtn.classList.add('btn-outline-secondary');
             }
         });
-        
+
         // Zapisz stan panelu przed odświeżeniem
-        window.addEventListener('beforeunload', function() {
+        window.addEventListener('beforeunload', function () {
             const isVisible = filtersPanel.style.display === 'block';
             sessionStorage.setItem('filtersPanelVisible', isVisible);
         });
