@@ -27,5 +27,15 @@ Dodatkowo:
 8. Aplikacja obsługuje załączniki (w formularzach oraz umożliwia pobieranie plików) 
 9. Aplikacja Generuje dokumenty (np.: pdf, excel, word) - można wybrać 1 typ dokumentu – **excel z listą wypożyczeń czytelnika?**
 
-Admin login: beliasariuscawl@mechanicus.com
-Admin hasło: ArchmagosDominus123
+
+
+| Typ           | Email                            | Hasło                | Rola            |
+| ------------- | -------------------------------- | -------------------- | --------------- |
+| **Admin**     | belisarius.cawl@mechanicus.com   | ArchmagosDominus123! | Admin, Employee |
+| **Pracownik** | anna.kowalska@library.com        | Employee123!         | Employee        |
+| **Pracownik** | piotr.nowak@library.com          | Employee123!         | Employee        |
+| **Pracownik** | maria.wisniewska@library.com     | Employee123!         | Employee        |
+| **Czytelnik** | jan.kowalski@reader.com          | Reader123!           | Reader          |
+| **Czytelnik** | agnieszka.nowak@reader.com       | Reader123!           | Reader          |
+| **Czytelnik** | michal.wisniewski@reader.com     | Reader123!           | Reader          |
+| **Czytelnik** | katarzyna.lewandowska@reader.com | Reader123!           | Reader          |
