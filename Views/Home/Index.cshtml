@@ -1,8 +1,43 @@
-﻿@{
+﻿@model marsian_library.Models.WeatherRaport
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="d-flex flex-column justify-content-center">
+    <div class = "flex">
+        <h2>Current weather on Mars</h2>
+        <div class = "border border-5 rounded">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Sol</th>
+                        <th>Seazon</th>
+                        <th>Avg. Temp. (°C)</th>
+                        <th>Temp. Amplitude (°C)</th>
+                        <th>Avg. Pressure(Pa)</th>
+                        <th>Avg. Wind Speed(m/s)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var solKey in Model.SolKeys)
+                    {
+                        if (Model.Sols.TryGetValue(solKey, out var sol))
+                        {
+                            <tr>
+                                <td>@solKey</td>
+                                <td>@sol.Season</td>
+                                <td>@(sol.AirTemperature?.Average.ToString("F1") ?? "[...]")</td>
+                                <td>
+                                    @(sol.AirTemperature?.Minimum.ToString("F1") ?? "N/A") /
+                                    @(sol.AirTemperature?.Maximum.ToString("F1") ?? "N/A")
+                                </td>
+                                <td>@(sol.AtmosphericPressure?.Average.ToString("F1") ?? "[...]")</td>
+                                <td>@(sol.HorizontalWindSpeed?.Average.ToString("F1") ?? "[...]")</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>

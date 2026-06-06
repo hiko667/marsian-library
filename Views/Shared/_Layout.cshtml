@@ -12,7 +12,7 @@
 </head>
 <body class = "no-transition">
     <header>
-        <nav class="navbar navbar-expand-sm navbar-dark bg-mars-dark border-bottom box-shadow mb-3 navbar-mars">
+        <nav class="navbar navbar-expand-sm navbar-dark bg-gradient bg-mars-dark border-bottom box-shadow mb-3 navbar-mars">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">The Library of Planet Mars</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-coSllapse" aria-controls="navbarSupportedContent"
@@ -24,8 +24,14 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
+                        @if (User.Identity != null && User.Identity.IsAuthenticated && (User.IsInRole("Employee") || User.IsInRole("Admin")))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="BookCrud">Books</a>
+                            </li>
+                        }   
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="BookCrud">Books</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Search" asp-action="Index">Search</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Search" asp-action="Index">Search</a>
@@ -47,7 +53,7 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-white bg-mars-dark">
+    <footer class="border-top footer text-white bg-gradient bg-mars-dark">
         <div class="container">
             &copy; 2026 - Marsian Library - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>

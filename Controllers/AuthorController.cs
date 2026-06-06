@@ -45,7 +45,7 @@ namespace marsian_library.Controllers
         }
 
         // GET: Author/Create
-        [Authorize(Roles = "Employee")]
+        [Authorize(Roles = "Employee,Admin")]
         public IActionResult Create()
         {
             return View();
@@ -56,7 +56,7 @@ namespace marsian_library.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Employee")]
+        [Authorize(Roles = "Employee,Admin")]
         public async Task<IActionResult> Create([Bind("Id,FirstName,LastName")] Author author)
         {
             if (ModelState.IsValid)
@@ -69,7 +69,7 @@ namespace marsian_library.Controllers
         }
 
         // GET: Author/Edit/5
-        [Authorize(Roles = "Employee")]
+        [Authorize(Roles = "Employee,Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -90,7 +90,7 @@ namespace marsian_library.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Employee")]
+        [Authorize(Roles = "Employee,Admin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,FirstName,LastName")] Author author)
         {
             if (id != author.Id)
@@ -122,7 +122,7 @@ namespace marsian_library.Controllers
         }
 
         // GET: Author/Delete/5
-        [Authorize(Roles = "Employee")]
+        [Authorize(Roles = "Employee,Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -141,7 +141,7 @@ namespace marsian_library.Controllers
         }
 
         // POST: Author/Delete/5
-        [Authorize(Roles = "Employee")]
+        [Authorize(Roles = "Employee,Admin")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

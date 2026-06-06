@@ -56,12 +56,11 @@ public class BookController : Controller
     }
 
     // GET: Book/Create
-<<<<<<< HEAD
-    [Authorize(Roles = "Employee")]
-    public IActionResult Create()
-=======
     public async Task<IActionResult> Create()
->>>>>>> 984e7c2 (added book searching)
+
+    [Authorize(Roles = "Employee, Admin")]
+    public async Task<IActionResult> Create()
+
     {
         ViewData["PublisherId"] = new SelectList(_context.Publishers, "Id", "Name");
         ViewBag.Authors = new MultiSelectList(_context.Authors, "Id", "FullName");
@@ -80,13 +79,12 @@ public class BookController : Controller
     // POST: Book/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-<<<<<<< HEAD
-    [Authorize(Roles = "Employee")]
-    public async Task<IActionResult> Create(Book book, int[]? selectedAuthors, int[]? selectedGenres, int[]? selectedLanguages)
-=======
     public async Task<IActionResult> Create(Book book, int[]? selectedAuthors, int[]? selectedGenres,
         int[]? selectedLanguages, List<DeptCopyInput> departmentCopies)
->>>>>>> 984e7c2 (added book searching)
+
+    [Authorize(Roles = "Employee, Admin")]
+    public async Task<IActionResult> Create(Book book, int[]? selectedAuthors, int[]? selectedGenres,
+        int[]? selectedLanguages, List<DeptCopyInput> departmentCopies)
     {
         // Usuń walidację dla kolekcji
         ModelState.Remove("Authors");
@@ -175,7 +173,7 @@ public class BookController : Controller
     }
 
     // GET: Book/Edit/5
-    [Authorize(Roles = "Employee")]
+    [Authorize(Roles = "Employee,Admin")]
     public async Task<IActionResult> Edit(int? id)
     {
         if (id == null) return NotFound();
@@ -212,7 +210,7 @@ public class BookController : Controller
     }
 
     // POST: Book/Edit/5
-    [Authorize(Roles = "Employee")]
+    [Authorize(Roles = "Employee,Admin")]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, Book book, int[]? selectedAuthors, int[]? selectedGenres,
@@ -351,7 +349,7 @@ public class BookController : Controller
     }
 
     // GET: Book/Delete/5
-    [Authorize(Roles = "Employee")]
+    [Authorize(Roles = "Employee,Admin")]
     public async Task<IActionResult> Delete(int? id)
     {
         if (id == null) return NotFound();
@@ -372,7 +370,7 @@ public class BookController : Controller
     [HttpPost, ActionName("Delete")]
     
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Employee")]
+    [Authorize(Roles = "Employee,Admin")]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
         var book = await _context.Books.FindAsync(id);

@@ -143,7 +143,7 @@ else
                             @(book.Genres != null && book.Genres.Any()
                                 ? string.Join(", ", book.Genres.Select(g => g.Name))
                                 : "-")<br />
-                            <strong>Languages:</strong>
+                            <strong>Langdouages:</strong>
                             @(book.Languages != null && book.Languages.Any()
                                 ? string.Join(", ", book.Languages.Select(l => l.Name))
                                 : "-")
@@ -151,8 +151,11 @@ else
                     </div>
                     <div class="card-footer bg-transparent">
                         <a asp-action="Details" asp-route-id="@book.Id" class="btn btn-sm btn-info">Details</a>
-                         <!-- TUTAJ TYLKO DLA BIBLIOTEKARZY -->
-                        <a asp-controller="Book" asp-action="Edit" asp-route-id="@book.Id" class="btn btn-sm btn-warning">Edit</a>
+                        <!-- TUTAJ TYLKO DLA BIBLIOTEKARZY -->
+                        @if (User.Identity != null && User.Identity.IsAuthenticated && (User.IsInRole("Employee") || User.IsInRole("Admin")))
+                        {
+                            <a asp-controller="Book" asp-action="Edit" asp-route-id="@book.Id" class="btn btn-sm btn-warning">Edit</a>
+                        }
                     </div>
                 </div>
             </div>

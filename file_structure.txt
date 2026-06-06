@@ -1,0 +1,141 @@
+.
+├── appsettings.json
+├── Areas
+│   └── Identity
+│       └── Pages
+│           ├── Account
+│           │   ├── Login.cshtml
+│           │   ├── Login.cshtml.cs
+│           │   ├── Logout.cshtml
+│           │   ├── Logout.cshtml.cs
+│           │   ├── Register.cshtml
+│           │   ├── Register.cshtml.cs
+│           │   └── _ViewImports.cshtml
+│           ├── _ValidationScriptsPartial.cshtml
+│           ├── _ViewImports.cshtml
+│           └── _ViewStart.cshtml
+├── Controllers
+│   ├── AuthorController.cs
+│   ├── BookApiController.cs
+│   ├── BookController.cs
+│   ├── DeptController.cs
+│   ├── GenreController.cs
+│   ├── HomeController.cs
+│   ├── LanguageController.cs
+│   ├── PublisherController.cs
+│   └── SearchController.cs
+├── daneTestowe.sql
+├── Data
+│   ├── AppDbContext.cs
+│   └── DbInitializer.cs
+├── DATABASE_INSTALL.md
+├── docker-compose.yml
+├── marsian-library.csproj
+├── marsian-library.sln
+├── Migrations
+│   ├── 20260512114747_Init.cs
+│   ├── 20260512114747_Init.Designer.cs
+│   ├── 20260512165245_afterpull.cs
+│   ├── 20260512165245_afterpull.Designer.cs
+│   ├── 20260512182517_users.cs
+│   ├── 20260512182517_users.Designer.cs
+│   ├── 20260528205833_nazwa.cs
+│   ├── 20260528205833_nazwa.Designer.cs
+│   ├── 20260528211124_AddGuidToBook.cs
+│   ├── 20260528211124_AddGuidToBook.Designer.cs
+│   ├── 20260601150858_Seeding.cs
+│   ├── 20260601150858_Seeding.Designer.cs
+│   ├── 20260601151732_MakeEmpDeptNullable.cs
+│   ├── 20260601151732_MakeEmpDeptNullable.Designer.cs
+│   ├── 20260601151951_MakeEmpDeptNullableNowFr.cs
+│   ├── 20260601151951_MakeEmpDeptNullableNowFr.Designer.cs
+│   └── AppDbContextModelSnapshot.cs
+├── Models
+│   ├── Address.cs
+│   ├── ApplicationUserModel.cs
+│   ├── Author.cs
+│   ├── BookAuthor.cs
+│   ├── Book.cs
+│   ├── BookGenre.cs
+│   ├── BookLanguage.cs
+│   ├── Borrow.cs
+│   ├── Copy.cs
+│   ├── Dept.cs
+│   ├── Emp.cs
+│   ├── ErrorViewModel.cs
+│   ├── Genre.cs
+│   ├── Job.cs
+│   ├── Language.cs
+│   ├── Publisher.cs
+│   ├── Reader.cs
+│   ├── State.cs
+│   └── WeatherRaport.cs
+
+├── Program.cs
+├── Properties
+│   └── launchSettings.json
+├── README.md
+├── Services
+│   ├── BookService.cs
+│   ├── IBookService.cs
+│   └── WeatherRaportService.cs
+├── Untitled-1.sqlnb
+├── Views
+│   ├── Author
+│   │   ├── Create.cshtml
+│   │   ├── Delete.cshtml
+│   │   ├── Details.cshtml
+│   │   ├── Edit.cshtml
+│   │   └── Index.cshtml
+│   ├── Book
+│   │   ├── Create.cshtml
+│   │   ├── Delete.cshtml
+│   │   ├── Details.cshtml
+│   │   ├── Edit.cshtml
+│   │   └── Index.cshtml
+│   ├── Dept
+│   │   ├── Create.cshtml
+│   │   ├── Delete.cshtml
+│   │   ├── Details.cshtml
+│   │   ├── Edit.cshtml
+│   │   └── Index.cshtml
+│   ├── Genre
+│   │   ├── Create.cshtml
+│   │   ├── Delete.cshtml
+│   │   ├── Details.cshtml
+│   │   ├── Edit.cshtml
+│   │   └── Index.cshtml
+│   ├── Home
+│   │   ├── BookCrud.cshtml
+│   │   ├── Index.cshtml
+│   │   └── Privacy.cshtml
+│   ├── Language
+│   │   ├── Create.cshtml
+│   │   ├── Delete.cshtml
+│   │   ├── Details.cshtml
+│   │   ├── Edit.cshtml
+│   │   └── Index.cshtml
+│   ├── Publisher
+│   │   ├── Create.cshtml
+│   │   ├── Delete.cshtml
+│   │   ├── Details.cshtml
+│   │   ├── Edit.cshtml
+│   │   └── Index.cshtml
+│   ├── Search
+│   │   ├── Borrow.cshtml
+│   │   ├── Details.cshtml
+│   │   └── Index.cshtml
+│   ├── Shared
+│   │   ├── Error.cshtml
+│   │   ├── _Layout.cshtml
+│   │   ├── _Layout.cshtml.css
+│   │   ├── _LoginPartial.cshtml
+│   │   └── _ValidationScriptsPartial.cshtml
+│   ├── _ViewImports.cshtml
+│   └── _ViewStart.cshtml
+└── wwwroot
+    ├── css
+    │   └── site.css
+    ├── favicon.ico
+    ├── js
+    │   └── site.js
