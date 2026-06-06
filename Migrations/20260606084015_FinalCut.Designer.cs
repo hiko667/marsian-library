@@ -12,8 +12,8 @@ using marsian_library.Data;
 namespace marsian_library.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260605090144_basicMigration")]
-    partial class basicMigration
+    [Migration("20260606084015_FinalCut")]
+    partial class FinalCut
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -554,9 +554,6 @@ namespace marsian_library.Migrations
                         .HasColumnType("NUMBER(10)");
 
                     OraclePropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("ChildrenFriendly")
-                        .HasColumnType("NUMBER(1)");
 
                     b.Property<string>("Name")
                         .IsRequired()

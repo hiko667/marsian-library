@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace marsian_library.Migrations
 {
     /// <inheritdoc />
-    public partial class basicMigration : Migration
+    public partial class FinalCut : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -69,8 +69,7 @@ namespace marsian_library.Migrations
                 {
                     Id = table.Column<int>(type: "NUMBER(10)", nullable: false)
                         .Annotation("Oracle:Identity", "START WITH 1 INCREMENT BY 1"),
-                    Name = table.Column<string>(type: "NVARCHAR2(50)", maxLength: 50, nullable: false),
-                    ChildrenFriendly = table.Column<bool>(type: "NUMBER(1)", nullable: false)
+                    Name = table.Column<string>(type: "NVARCHAR2(50)", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
                 {

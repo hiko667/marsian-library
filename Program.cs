@@ -42,7 +42,7 @@ using (var scope = app.Services.CreateScope())
         //await DbInitializer.SeedAllAsync(services);
         
         // Opcja 2: Reset i reseed (usuwa wszystkie dane i dodaje od nowa)
-        // await DbInitializer.ResetAndReseedAsync(services);
+        //await DbInitializer.ResetAndReseedAsync(services);
     }
     catch (Exception ex)
     {
