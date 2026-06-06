@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -12,25 +13,111 @@ namespace marsian_library.Controllers;
 public class BookController : Controller
 {
     private readonly AppDbContext _context;
+    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly int PageSize = 9;
 
-    public BookController(AppDbContext context)
+    public BookController(AppDbContext context, UserManager<ApplicationUser> userManager)
     {
         _context = context;
+        _userManager = userManager;
     }
 
-    // GET: Book
-    public async Task<IActionResult> Index()
+    // GET: Book/Index
+    public async Task<IActionResult> Index(string searchString, int? page, int? copyId,
+        int[]? selectedGenres, int[]? selectedLanguages, int[]? selectedPublishers)
     {
-        var books = _context.Books
+        // Obsługa wypożyczenia z widoku szczegółów
+        if (copyId.HasValue)
+        {
+            TempData["CopyId"] = copyId.Value;
+            return RedirectToAction("Borrow", new { copyId = copyId.Value });
+        }
+
+        // Pobierz wszystkie książki z relacjami
+        var booksQuery = _context.Books
             .Include(b => b.Publisher)
             .Include(b => b.Authors)
             .Include(b => b.Genres)
-            .Include(b => b.Languages);
-        return View(await books.ToListAsync());
+            .Include(b => b.Languages)
+            .AsQueryable();
+
+        // Filtrowanie po tytule, ISBN lub autorze
+        if (!string.IsNullOrEmpty(searchString))
+        {
+            searchString = searchString.ToLower();
+            booksQuery = booksQuery.Where(b =>
+                b.Title.ToLower().Contains(searchString) ||
+                b.Isbn.Contains(searchString) ||
+                b.Authors.Any(a =>
+                    a.FirstName.ToLower().Contains(searchString) ||
+                    a.LastName.ToLower().Contains(searchString))
+            );
+        }
+
+        // Filtrowanie po gatunkach
+        if (selectedGenres != null && selectedGenres.Any())
+        {
+            booksQuery = booksQuery.Where(b =>
+                b.Genres.Any(g => selectedGenres.Contains(g.Id)));
+        }
+
+        // Filtrowanie po językach
+        if (selectedLanguages != null && selectedLanguages.Any())
+        {
+            booksQuery = booksQuery.Where(b =>
+                b.Languages.Any(l => selectedLanguages.Contains(l.Id)));
+        }
+
+        // Filtrowanie po wydawcach
+        if (selectedPublishers != null && selectedPublishers.Any())
+        {
+            booksQuery = booksQuery.Where(b =>
+                selectedPublishers.Contains(b.PublisherId));
+        }
+
+        // Paginacja
+        int pageNumber = page ?? 1;
+        int totalBooks = await booksQuery.CountAsync();
+        int totalPages = (int)Math.Ceiling((double)totalBooks / PageSize);
+
+        var books = await booksQuery
+            .OrderBy(b => b.Title)
+            .Skip((pageNumber - 1) * PageSize)
+            .Take(PageSize)
+            .ToListAsync();
+
+        // Przekazanie danych do widoku
+        ViewBag.CurrentPage = pageNumber;
+        ViewBag.TotalPages = totalPages;
+        ViewBag.SearchString = searchString;
+        ViewBag.TotalBooks = totalBooks;
+        ViewBag.SelectedGenres = selectedGenres ?? Array.Empty<int>();
+        ViewBag.SelectedLanguages = selectedLanguages ?? Array.Empty<int>();
+        ViewBag.SelectedPublishers = selectedPublishers ?? Array.Empty<int>();
+
+        // Przygotuj listy dla filtrów
+        ViewBag.Genres = new MultiSelectList(await _context.Genres.OrderBy(g => g.Name).ToListAsync(), "Id", "Name", selectedGenres);
+        ViewBag.Languages = new MultiSelectList(await _context.Languages.OrderBy(l => l.Name).ToListAsync(), "Id", "Name", selectedLanguages);
+        ViewBag.Publishers = new MultiSelectList(await _context.Publishers.OrderBy(p => p.Name).ToListAsync(), "Id", "Name", selectedPublishers);
+
+        // Przygotowanie listy dostępnych egzemplarzy dla każdej książki
+        var copiesDict = new Dictionary<int, List<Copy>>();
+        foreach (var book in books)
+        {
+            var availableCopies = await _context.Copies
+                .Include(c => c.State)
+                .Include(c => c.Dept)
+                .Where(c => c.BookId == book.Id && c.State.Name == "Available")
+                .ToListAsync();
+            copiesDict[book.Id] = availableCopies;
+        }
+        ViewBag.AvailableCopies = copiesDict;
+
+        return View(books);
     }
 
     // GET: Book/Details/5
-    public async Task<IActionResult> Details(int? id)
+    public async Task<IActionResult> Details(int? id, int? copyId)
     {
         if (id == null) return NotFound();
 
@@ -43,14 +130,30 @@ public class BookController : Controller
 
         if (book == null) return NotFound();
 
-        // Pobierz egzemplarze książki
+        // Pobierz wszystkie egzemplarze książki
         var copies = await _context.Copies
-            .Include(c => c.Dept)
             .Include(c => c.State)
+            .Include(c => c.Dept)
             .Where(c => c.BookId == id)
             .ToListAsync();
 
+        // Pobierz aktualne wypożyczenia dla tych egzemplarzy
+        var currentBorrows = await _context.Borrows
+            .Include(b => b.Reader)
+            .Where(b => b.ReturnDate == null && copies.Select(c => c.Id).Contains(b.CopyId))
+            .ToListAsync();
+
         ViewBag.Copies = copies;
+        ViewBag.CopyBorrowers = currentBorrows
+            .Where(b => b.Reader != null)
+            .ToDictionary(b => b.CopyId, b => b.Reader!);
+
+        // Jeśli wybrano konkretny egzemplarz, przekaż do wypożyczenia
+        if (copyId.HasValue)
+        {
+            TempData["CopyId"] = copyId.Value;
+            return RedirectToAction("Borrow", new { copyId = copyId.Value });
+        }
 
         return View(book);
     }
@@ -75,7 +178,7 @@ public class BookController : Controller
 
         return View();
     }
-    
+
     // POST: Book/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -84,15 +187,18 @@ public class BookController : Controller
 
     [Authorize(Roles = "Employee, Admin")]
     public async Task<IActionResult> Create(Book book, int[]? selectedAuthors, int[]? selectedGenres,
-        int[]? selectedLanguages, List<DeptCopyInput> departmentCopies)
+        int[]? selectedLanguages, List<DeptCopyInput>? departmentCopies)
     {
         // Usuń walidację dla kolekcji
         ModelState.Remove("Authors");
         ModelState.Remove("Genres");
         ModelState.Remove("Languages");
 
-        // Sprawdź, czy wybrano przynajmniej jeden departament z liczbą kopii > 0
-        if (departmentCopies == null || !departmentCopies.Any(dc => dc.NumberOfCopies > 0))
+        var selectedDepartments = departmentCopies?
+            .Where(dc => dc != null && dc.DeptId > 0 && dc.NumberOfCopies > 0)
+            .ToList() ?? new List<DeptCopyInput>();
+
+        if (!selectedDepartments.Any())
         {
             ModelState.AddModelError("", "Please select at least one department with at least one copy.");
             await PrepareCreateView();
@@ -141,7 +247,7 @@ public class BookController : Controller
                 }
 
                 // Utwórz egzemplarze dla każdego wybranego departamentu
-                foreach (var deptCopy in departmentCopies.Where(dc => dc.NumberOfCopies > 0 && dc.DeptId > 0))
+                foreach (var deptCopy in selectedDepartments)
                 {
                     for (int i = 0; i < deptCopy.NumberOfCopies; i++)
                     {
@@ -158,7 +264,7 @@ public class BookController : Controller
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                TempData["Success"] = $"Book '{book.Title}' created successfully with {departmentCopies.Sum(dc => dc.NumberOfCopies)} copies across selected departments.";
+                TempData["Success"] = $"Book '{book.Title}' created successfully with {selectedDepartments.Sum(dc => dc.NumberOfCopies)} copies across selected departments.";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
@@ -357,8 +463,6 @@ public class BookController : Controller
         var book = await _context.Books
             .Include(b => b.Publisher)
             .Include(b => b.Authors)
-            .Include(b => b.Genres)
-            .Include(b => b.Languages)
             .FirstOrDefaultAsync(m => m.Id == id);
 
         if (book == null) return NotFound();
@@ -368,7 +472,7 @@ public class BookController : Controller
 
     // POST: Book/Delete/5
     [HttpPost, ActionName("Delete")]
-    
+
     [ValidateAntiForgeryToken]
     [Authorize(Roles = "Employee,Admin")]
     public async Task<IActionResult> DeleteConfirmed(int id)
@@ -377,6 +481,223 @@ public class BookController : Controller
         if (book != null) _context.Books.Remove(book);
         await _context.SaveChangesAsync();
         return RedirectToAction(nameof(Index));
+    }
+
+    // GET: Book/Borrow/5
+    [Authorize(Roles = "Reader,Employee,Admin")]
+    public async Task<IActionResult> Borrow(int? copyId)
+    {
+        if (copyId == null) return NotFound();
+
+        var currentUser = await _userManager.GetUserAsync(User);
+        if (currentUser == null)
+        {
+            TempData["Error"] = "Only authenticated users can borrow books.";
+            return RedirectToAction("Index");
+        }
+
+        var copy = await _context.Copies
+            .Include(c => c.Book)
+            .Include(c => c.Dept)
+            .FirstOrDefaultAsync(c => c.Id == copyId);
+
+        if (copy == null) return NotFound();
+
+        // Sprawdź czy egzemplarz jest dostępny
+        var availableState = await _context.States.FirstOrDefaultAsync(s => s.Name == "Available");
+        if (copy.StateId != availableState?.Id)
+        {
+            TempData["Error"] = "This copy is not available for borrowing.";
+            return RedirectToAction("Index");
+        }
+
+        var borrow = new Borrow
+        {
+            CopyId = copy.Id,
+            BorrowDate = DateTime.Now,
+            ExpectedReturnDate = DateTime.Now.AddDays(14), // Domyślne 14 dni dla czytelnika
+            TimesExtended = 0
+        };
+
+        var isStaff = User.IsInRole("Employee") || User.IsInRole("Admin");
+
+        if (User.IsInRole("Reader"))
+        {
+            if (currentUser.ReaderId == null)
+            {
+                TempData["Error"] = "Your user account is not linked to a reader profile.";
+                return RedirectToAction("Index");
+            }
+
+            borrow.ReaderId = currentUser.ReaderId.Value;
+        }
+        else if (isStaff)
+        {
+            ViewBag.ReaderId = new SelectList(_context.Readers, "Id", "FullName");
+        }
+
+        ViewBag.CopyInfo = $"{copy.Book?.Title} - Copy #{copy.Id}";
+        ViewBag.IsStaff = isStaff;
+
+        return View(borrow);
+    }
+
+    // POST: Book/Borrow
+    [Authorize(Roles = "Reader,Employee,Admin")]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Borrow(Borrow borrow)
+    {
+        ModelState.Remove("Copy");
+        ModelState.Remove("Reader");
+
+        var currentUser = await _userManager.GetUserAsync(User);
+        if (currentUser == null)
+        {
+            TempData["Error"] = "Only authenticated users can borrow books.";
+            return RedirectToAction("Index");
+        }
+
+        var isStaff = User.IsInRole("Employee") || User.IsInRole("Admin");
+
+        if (User.IsInRole("Reader"))
+        {
+            if (currentUser.ReaderId == null)
+            {
+                TempData["Error"] = "Your user account is not linked to a reader profile.";
+                return RedirectToAction("Index");
+            }
+
+            borrow.ReaderId = currentUser.ReaderId.Value;
+            // Czytelnik nie może zmienić daty zwrotu - ustaw domyślną
+            borrow.ExpectedReturnDate = DateTime.Now.AddDays(14);
+        }
+        else if (isStaff)
+        {
+            if (borrow.ReaderId <= 0 || !await _context.Readers.AnyAsync(r => r.Id == borrow.ReaderId))
+            {
+                ModelState.AddModelError("ReaderId", "Please select a valid reader.");
+            }
+
+            // Pracownik może ustawić własną datę zwrotu
+            if (borrow.ExpectedReturnDate == default)
+            {
+                borrow.ExpectedReturnDate = DateTime.Now.AddDays(14);
+            }
+        }
+
+        if (ModelState.IsValid)
+        {
+            try
+            {
+                // Sprawdź ponownie dostępność egzemplarza
+                var copy = await _context.Copies
+                    .Include(c => c.State)
+                    .FirstOrDefaultAsync(c => c.Id == borrow.CopyId);
+
+                if (copy == null)
+                {
+                    TempData["Error"] = "Copy not found.";
+                    return RedirectToAction("Index");
+                }
+
+                var availableState = await _context.States.FirstOrDefaultAsync(s => s.Name == "Available");
+                if (copy.State?.Name != "Available")
+                {
+                    TempData["Error"] = "This copy is no longer available.";
+                    return RedirectToAction("Index");
+                }
+
+                // Zmień stan egzemplarza na "Borrowed"
+                var borrowedState = await _context.States.FirstOrDefaultAsync(s => s.Name == "Borrowed");
+                if (borrowedState != null)
+                {
+                    copy.StateId = borrowedState.Id;
+                    _context.Update(copy);
+                }
+
+                // Ustaw datę wypożyczenia
+                borrow.BorrowDate = DateTime.Now;
+
+                _context.Add(borrow);
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = $"Book borrowed successfully! Expected return: {borrow.ExpectedReturnDate.ToShortDateString()}";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Error: {ex.Message}");
+            }
+        }
+
+        // Jeśli błąd, przygotuj ponownie widok
+        if (isStaff)
+        {
+            ViewBag.ReaderId = new SelectList(_context.Readers, "Id", "FullName", borrow.ReaderId);
+        }
+
+        var copyInfo = await _context.Copies
+            .Include(c => c.Book)
+            .FirstOrDefaultAsync(c => c.Id == borrow.CopyId);
+        ViewBag.CopyInfo = $"{copyInfo?.Book?.Title} - Copy #{borrow.CopyId}";
+        ViewBag.IsStaff = isStaff;
+
+        return View(borrow);
+    }
+
+    // POST: Book/Return
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Return(int borrowId)
+    {
+        var borrow = await _context.Borrows
+            .Include(b => b.Copy)
+            .FirstOrDefaultAsync(b => b.Id == borrowId);
+
+        if (borrow == null) return NotFound();
+
+        if (borrow.ReturnDate == null)
+        {
+            borrow.ReturnDate = DateTime.Now;
+            _context.Update(borrow);
+
+            // Zmień stan egzemplarza z powrotem na "Available"
+            var availableState = await _context.States.FirstOrDefaultAsync(s => s.Name == "Available");
+            if (availableState != null && borrow.Copy != null)
+            {
+                borrow.Copy.StateId = availableState.Id;
+                _context.Update(borrow.Copy);
+            }
+
+            await _context.SaveChangesAsync();
+            TempData["Success"] = "Book returned successfully!";
+        }
+
+        return RedirectToAction("Index");
+    }
+
+    // GET: Book/MyBorrowings
+    public async Task<IActionResult> MyBorrowings(int? readerId)
+    {
+        if (readerId == null) return View(new List<Borrow>());
+
+        var borrowings = await _context.Borrows
+            .Include(b => b.Copy)
+                .ThenInclude(c => c.Book)
+            .Include(b => b.Copy)
+                .ThenInclude(c => c.Dept)
+            .Where(b => b.ReaderId == readerId && b.ReturnDate == null)
+            .OrderBy(b => b.ExpectedReturnDate)
+            .ToListAsync();
+
+        return View(borrowings);
+    }
+
+    // GET: Book/ResetFilters
+    public IActionResult ResetFilters()
+    {
+        return RedirectToAction("Index");
     }
 
     private bool BookExists(int id)

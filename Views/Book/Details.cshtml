@@ -30,7 +30,11 @@
                             }
                         </ul>
                     }
-                    else { <span>-</span> }
+                    else
+                    {
+
+                        <span>-</span>
+                    }
                 </td>
             </tr>
             <tr>
@@ -45,7 +49,11 @@
                             }
                         </ul>
                     }
-                    else { <span>-</span> }
+                    else
+                    {
+
+                        <span>-</span>
+                    }
                 </td>
             </tr>
             <tr>
@@ -60,14 +68,18 @@
                             }
                         </ul>
                     }
-                    else { <span>-</span> }
+                    else
+                    {
+
+                        <span>-</span>
+                    }
                 </td>
             </tr>
         </table>
     </div>
 
     <div class="col-md-6">
-        <h4>Copies</h4>
+        <h4>Available Copies</h4>
         @{
             var copies = ViewBag.Copies as List<marsian_library.Models.Copy>;
         }
@@ -79,6 +91,7 @@
                         <th>Copy ID</th>
                         <th>Department</th>
                         <th>Status</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -86,11 +99,36 @@
                     {
                         <tr>
                             <td>@copy.Id</td>
-                            <td>@copy.Dept?.Id ?? "Unknown"</td>
+                            <td>
+                                @copy.Dept.Id
+                            </td>
                             <td>
                                 <span class="badge @(copy.State?.Name == "Available" ? "bg-success" : "bg-warning")">
+
                                     @copy.State?.Name
                                 </span>
+                            </td>
+                            <td>
+                                @if (copy.State?.Name == "Available")
+                                {
+                                    <a asp-action="Borrow" asp-route-copyId="@copy.Id" class="btn btn-sm btn-primary">Borrow</a>
+                                }
+                                else
+                                {
+                                    var borrowers = ViewBag.CopyBorrowers as Dictionary<int, marsian_library.Models.Reader>;
+                                    if (borrowers != null && borrowers.TryGetValue(copy.Id, out var borrower) && borrower != null)
+                                    {
+                                        <a asp-controller="Reader" asp-action="Details" asp-route-id="@borrower.Id"
+                                           class="btn btn-sm btn-secondary">
+                                            Borrowed by @($"{borrower.FirstName} {borrower.LastName}")
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-sm btn-secondary" disabled>Not Available</button>
+                                    }
+                                }
+
                             </td>
                         </tr>
                     }
@@ -99,12 +137,18 @@
         }
         else
         {
-            <p>No copies available for this book.</p>
+            <p>No copies available.</p>
         }
     </div>
 </div>
 
 <div class="mt-3">
-    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
-    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to Search</a>
+
+    <!-- TUTAJ TYLKO DLA BIBLIOTEKARZY -->
+    @if (User.Identity != null && User.Identity.IsAuthenticated && (User.IsInRole("Employee") || User.IsInRole("Admin")))
+    {
+        <a asp-controller="Book" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-sm btn-warning">Edit book</a>
+        <a asp-controller="Book" asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-sm btn-danger">Delete book</a>
+    }
 </div>

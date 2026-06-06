@@ -1,62 +1,262 @@
 @model IEnumerable<marsian_library.Models.Book>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Search Books";
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    string searchString = ViewBag.SearchString;
 }
 
-<h1>Index</h1>
+<h1>Book Search</h1>
+@if (User.Identity != null && User.Identity.IsAuthenticated && (User.IsInRole("Employee") || User.IsInRole("Admin")))
+{
+    <p>
+        <a asp-action="Create">Add new book</a>
+    </p>
+}
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Isbn)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Publisher)
-            </th>
-            <th>
-                Authors
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
+<!-- Formularz wyszukiwania i filtrów -->
+<form asp-action="Index" method="get" id="filterForm">
+    <!-- Podstawowe wyszukiwanie -->
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Search</h5>
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="toggleFiltersBtn">
+                <i class="fas fa-filter"></i> Show Filters
+            </button>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="input-group">
+                        <input type="text" name="searchString" class="form-control"
+                               placeholder="Search by title, ISBN, or author..." value="@searchString" />
+                        <button type="submit" class="btn btn-primary">Search</button>
+                        <a asp-action="ResetFilters" class="btn btn-secondary">Clear All</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rozwijany panel filtrów (początkowo ukryty) -->
+    <div class="card mb-4" id="filtersPanel" style="display: none;">
+        <div class="card-header">
+            <h5 class="mb-0">Filters</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- Filtr gatunków -->
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Genres</label>
+                    <select name="selectedGenres" class="form-control" asp-items="ViewBag.Genres" multiple="multiple"
+                            size="5">
+                    </select>
+                    <small class="form-text text-muted">Hold Ctrl to select multiple</small>
+                </div>
+
+                <!-- Filtr języków -->
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Languages</label>
+                    <select name="selectedLanguages" class="form-control" asp-items="ViewBag.Languages"
+                            multiple="multiple" size="5">
+                    </select>
+                    <small class="form-text text-muted">Hold Ctrl to select multiple</small>
+                </div>
+
+                <!-- Filtr wydawców -->
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Publishers</label>
+                    <select name="selectedPublishers" class="form-control" asp-items="ViewBag.Publishers"
+                            multiple="multiple" size="5">
+                    </select>
+                    <small class="form-text text-muted">Hold Ctrl to select multiple</small>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-12">
+                    <button type="submit" class="btn btn-primary">Apply Filters</button>
+                    <button type="button" class="btn btn-secondary" id="clearFiltersBtn">Clear Filters</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!-- Aktywne filtry -->
+@{
+    var selectedGenres = ViewBag.SelectedGenres as int[];
+    var selectedLanguages = ViewBag.SelectedLanguages as int[];
+    var selectedPublishers = ViewBag.SelectedPublishers as int[];
+    bool hasActiveFilters = (selectedGenres != null && selectedGenres.Any()) ||
+                            (selectedLanguages != null && selectedLanguages.Any()) ||
+                            (selectedPublishers != null && selectedPublishers.Any()) ||
+                            !string.IsNullOrEmpty(searchString);
+}
+
+@if (hasActiveFilters)
+{
+    <div class="alert alert-info">
+        <strong>Active filters:</strong>
+        @if (!string.IsNullOrEmpty(searchString))
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Title)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Isbn)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Publisher.Name)
-                </td>
-                <td>
-                    @if (item.Authors != null && item.Authors.Any())
-                    {
-                        @string.Join(", ", item.Authors.Select(a => a.FullName))
-                    }
-                    else
-                    {
-                        <span>-</span>
-                    }
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
-            </tr>
+            <span class="badge bg-primary me-1">Search: @searchString</span>
         }
-    </tbody>
-</table>
+        @if (selectedGenres != null && selectedGenres.Any())
+        {
+            <span class="badge bg-success me-1">Genres: @selectedGenres.Count() selected</span>
+        }
+        @if (selectedLanguages != null && selectedLanguages.Any())
+        {
+            <span class="badge bg-info me-1">Languages: @selectedLanguages.Count() selected</span>
+        }
+        @if (selectedPublishers != null && selectedPublishers.Any())
+        {
+            <span class="badge bg-warning me-1">Publishers: @selectedPublishers.Count() selected</span>
+        }
+        <a asp-action="ResetFilters" class="btn btn-sm btn-link">Clear all</a>
+    </div>
+}
+
+<!-- Wyniki wyszukiwania -->
+@if (!Model.Any())
+{
+    <div class="alert alert-warning">No books found matching your criteria.</div>
+}
+else
+{
+    <div class="alert alert-success">
+        @ViewBag.TotalBooks books found
+    </div>
+
+    <div class="row">
+        @foreach (var book in Model)
+        {
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a asp-action="Details" asp-route-id="@book.Id">@book.Title</a>
+                        </h5>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            @(book.Publisher?.Name ?? "Unknown Publisher")
+                        </h6>
+                        <p class="card-text">
+                            <strong>ISBN:</strong> @book.Isbn<br />
+                            <strong>Authors:</strong>
+                            @(book.Authors != null && book.Authors.Any()
+                                ? string.Join(", ", book.Authors.Select(a => a.FullName))
+                                : "-")<br />
+                            <strong>Genres:</strong>
+                            @(book.Genres != null && book.Genres.Any()
+                                ? string.Join(", ", book.Genres.Select(g => g.Name))
+                                : "-")<br />
+                            <strong>Languages:</strong>
+                            @(book.Languages != null && book.Languages.Any()
+                                ? string.Join(", ", book.Languages.Select(l => l.Name))
+                                : "-")
+                        </p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Paginacja -->
+    @if (totalPages > 1)
+    {
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                @if (currentPage > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Index" asp-route-page="@(currentPage - 1)"
+                           asp-route-searchString="@searchString"
+                           asp-route-selectedGenres="@(selectedGenres != null ? string.Join(",", selectedGenres) : null)"
+                           asp-route-selectedLanguages="@(selectedLanguages != null ? string.Join(",", selectedLanguages) : null)"
+                           asp-route-selectedPublishers="@(selectedPublishers != null ? string.Join(",", selectedPublishers) : null)">Previous</a>
+                    </li>
+                }
+
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(i == currentPage ? "active" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-searchString="@searchString"
+                           asp-route-selectedGenres="@(selectedGenres != null ? string.Join(",", selectedGenres) : null)"
+                           asp-route-selectedLanguages="@(selectedLanguages != null ? string.Join(",", selectedLanguages) : null)"
+                           asp-route-selectedPublishers="@(selectedPublishers != null ? string.Join(",", selectedPublishers) : null)">@i</a>
+                    </li>
+                }
+
+                @if (currentPage < totalPages)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Index" asp-route-page="@(currentPage + 1)"
+                           asp-route-searchString="@searchString"
+                           asp-route-selectedGenres="@(selectedGenres != null ? string.Join(",", selectedGenres) : null)"
+                           asp-route-selectedLanguages="@(selectedLanguages != null ? string.Join(",", selectedLanguages) : null)"
+                           asp-route-selectedPublishers="@(selectedPublishers != null ? string.Join(",", selectedPublishers) : null)">Next</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+}
+
+@section Scripts {
+    <script>
+        // Przełączanie widoczności panelu filtrów
+        const toggleBtn = document.getElementById('toggleFiltersBtn');
+        const filtersPanel = document.getElementById('filtersPanel');
+
+        toggleBtn.addEventListener('click', function () {
+            if (filtersPanel.style.display === 'none') {
+                filtersPanel.style.display = 'block';
+                toggleBtn.innerHTML = '<i class="fas fa-filter"></i> Hide Filters';
+                toggleBtn.classList.remove('btn-outline-secondary');
+                toggleBtn.classList.add('btn-secondary');
+            } else {
+                filtersPanel.style.display = 'none';
+                toggleBtn.innerHTML = '<i class="fas fa-filter"></i> Show Filters';
+                toggleBtn.classList.remove('btn-secondary');
+                toggleBtn.classList.add('btn-outline-secondary');
+            }
+        });
+
+        // Przycisk czyszczący filtry (resetuje tylko selecty, nie przesyła formularza)
+        const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+        if (clearFiltersBtn) {
+            clearFiltersBtn.addEventListener('click', function () {
+                const selects = document.querySelectorAll('#filtersPanel select[multiple]');
+                selects.forEach(select => {
+                    for (let i = 0; i < select.options.length; i++) {
+                        select.options[i].selected = false;
+                    }
+                });
+            });
+        }
+
+        // Zapamiętanie stanu panelu filtrów po odświeżeniu strony
+        document.addEventListener('DOMContentLoaded', function () {
+            const panelState = sessionStorage.getItem('filtersPanelVisible');
+            if (panelState === 'true') {
+                filtersPanel.style.display = 'block';
+                toggleBtn.innerHTML = '<i class="fas fa-filter"></i> Hide Filters';
+                toggleBtn.classList.remove('btn-outline-secondary');
+                toggleBtn.classList.add('btn-secondary');
+            } else {
+                filtersPanel.style.display = 'none';
+                toggleBtn.innerHTML = '<i class="fas fa-filter"></i> Show Filters';
+                toggleBtn.classList.remove('btn-secondary');
+                toggleBtn.classList.add('btn-outline-secondary');
+            }
+        });
+
+        // Zapisz stan panelu przed odświeżeniem
+        window.addEventListener('beforeunload', function () {
+            const isVisible = filtersPanel.style.display === 'block';
+            sessionStorage.setItem('filtersPanelVisible', isVisible);
+        });
+    </script>
+}

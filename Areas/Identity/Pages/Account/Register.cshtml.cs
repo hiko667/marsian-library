@@ -116,8 +116,7 @@ namespace marsian_library.Areas.Identity.Pages.Account
             public string Street { get; set; }
             [Required]
             public string Building { get; set; }
-            [Required]
-            public string Apartment { get; set; }
+            public string? Apartment { get; set; }
             [Required]
             public string ZipCode { get; set; }
             [Required]

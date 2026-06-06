@@ -1,23 +1,121 @@
 ﻿@{
-    ViewData["Title"] = "CRUD Operations Page";
+    ViewData["Title"] = "Library Management Operations";
 }
 
 <div class="text-center">
-    <h1 class="display-4">CRUD operations on books and such</h1>
-    <p>for users with permisions</p>
+    <h1 class="display-4">Library Management Operations</h1>
+    <p>for employees only</p>
 </div>
-<li>
-    <a class="nav-link" asp-area="" asp-controller="Book" asp-action="Index">Books</a>
-</li>
-<li>
-    <a class="nav-link" asp-area="" asp-controller="Author" asp-action="Index">Authors</a>
-</li>
-<li>
-    <a class="nav-link" asp-area="" asp-controller="Genre" asp-action="Index">Genres</a>
-</li>
-<li>
-    <a class="nav-link" asp-area="" asp-controller="Publisher" asp-action="Index">Publishers</a>
-</li>
-<li>
-    <a class="nav-link" asp-area="" asp-controller="Language" asp-action="Index">Languages</a>
-</li>
+<div class="row">
+
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title center">
+                    <a class="nav-link" asp-area="" asp-controller="Book" asp-action="Index">Books</a>
+                </h5>
+            </div>
+            <div class="card-footer bg-transparent">
+                <p class="card-text">Manage book collection, including adding new books, editing existing ones, and
+                    keeping track of the library's inventory.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title center">
+                        <a class="nav-link" asp-area="" asp-controller="Author" asp-action="Index">Authors</a>
+                    </h5>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <p class="card-text">Manage author information, including adding new authors, editing existing ones.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title center">
+                        <a class="nav-link" asp-area="" asp-controller="Genre" asp-action="Index">Genres</a>
+                    </h5>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <p class="card-text">Manage genre information, including adding new genres, editing existing ones.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title center">
+                        <a class="nav-link" asp-area="" asp-controller="Publisher" asp-action="Index">Publishers</a>
+                    </h5>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <p class="card-text">Manage publisher information, including adding new publishers, editing existing
+                        ones.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title center">
+                            <a class="nav-link" asp-area="" asp-controller="Language" asp-action="Index">Languages</a>
+                        </h5>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <p class="card-text">Manage language information, including adding new languages, editing existing ones.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title center">
+                            <a class="nav-link" asp-area="" asp-controller="Dept" asp-action="Index">Departments</a>
+                        </h5>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <p class="card-text">Manage department information, including adding new departments, editing existing
+                            ones. [Admin only]</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title center">
+                                <a class="nav-link" asp-area="" asp-controller="Reader" asp-action="Index">Readers</a>
+                            </h5>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <p class="card-text">Manage reader information, including adding new readers, editing existing
+                                ones.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title center">
+                                    <a class="nav-link" asp-area="" asp-controller="Borrow" asp-action="Index">Borrowings</a>
+                                </h5>
+                            </div>
+                            <div class="card-footer bg-transparent">
+                                <p class="card-text">Manage borrowing information, including adding new borrowings, editing existing
+                                    ones.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>

@@ -1,0 +1,121 @@
+@page
+@model marsian_library.Areas.Identity.Pages.Account.Manage.IndexModel
+
+@{
+    ViewData["Title"] = "My Account";
+}
+
+<h1>My Account</h1>
+
+@if (!Model.IsReader)
+{
+    <div class="alert alert-info">
+        <p>Your account is not linked to a reader profile.</p>
+    </div>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <strong>Reader Information</strong>
+                </div>
+                <div class="card-body">
+                    @if (Model.Reader != null)
+                    {
+                        <dl class="row">
+                            <dt class="col-sm-4">Name</dt>
+                            <dd class="col-sm-8">@Model.Reader.FullName</dd>
+
+                            <dt class="col-sm-4">Email</dt>
+                            <dd class="col-sm-8">@Model.Email</dd>
+
+                            <dt class="col-sm-4">Address</dt>
+                            <dd class="col-sm-8">
+                                @if (Model.Reader.Address != null)
+                                {
+                                    @Model.Reader.Address.FullAddress
+                                }
+                                else
+                                {
+                                    <span class="text-muted">No address on file</span>
+                                }
+                            </dd>
+                        </dl>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No reader profile found.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <strong>Current Borrowed Books</strong>
+                    <a asp-page="/Account/Manage/BorrowHistory" class="btn btn-sm btn-outline-primary">View all history</a>
+                </div>
+                <div class="card-body">
+                    @if (Model.CurrentBorrows.Any())
+                    {
+                        <table class="table table-sm table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Author</th>
+                                    <th>Copy ID</th>
+                                    <th>Dept ID</th>    
+                                    <th>Borrowed</th>
+                                    <th>Due</th>
+                                    <th>Extensions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var borrow in Model.CurrentBorrows)
+                                {
+                                    <tr>
+                                        <td>@borrow.BookTitle</td>
+                                        <td>@borrow.Author</td>
+                                        <td>@borrow.CopyId</td>
+                                        <td>@borrow.DeptId</td>
+                                        <td>@borrow.BorrowDate.ToShortDateString()</td>
+                                        <td>@borrow.ExpectedReturnDate.ToShortDateString()</td>
+                                        <td>
+                                            @if (borrow.CanExtend)
+                                            {
+                                                <form asp-page-handler="Extend" method="post" class="d-inline">
+                                                    <input type="hidden" name="borrowId" value="@borrow.BorrowId" />
+                                                    <button type="submit" class="btn btn-sm btn-outline-secondary">@borrow.ExtensionsRemaining extension@(borrow.ExtensionsRemaining == 1 ? "" : "s") left</button>
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">No extensions left</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">No active borrowed books.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
