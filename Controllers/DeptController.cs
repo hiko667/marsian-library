@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using marsian_library.Data;
@@ -41,7 +42,7 @@ public class DeptController : Controller
 
         return View(dept);
     }
-
+    [Authorize(Roles = "Admin")]
     // GET: Dept/Create
     public async Task<IActionResult> Create()
     {
@@ -50,14 +51,14 @@ public class DeptController : Controller
             .Include(e => e.Job)
             .Where(e => e.Job != null && e.Job.Name == "Director")
             .ToListAsync();
-        
+
         ViewData["DirectorId"] = new SelectList(directors, "Id", "FullName");
         ViewBag.ExistingAddresses = new SelectList(_context.Addresses, "Id", "FullAddress");
-        
+
         return View();
     }
-
     // POST: Dept/Create
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(Dept dept, Address address, bool useExistingAddress, int? existingAddressId)
@@ -65,7 +66,7 @@ public class DeptController : Controller
         if (ModelState.IsValid)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
-            
+
             try
             {
                 // Obsługa adresu
@@ -84,7 +85,7 @@ public class DeptController : Controller
                         await PrepareCreateView(dept.DirectorId);
                         return View(dept);
                     }
-                    
+
                     _context.Addresses.Add(address);
                     await _context.SaveChangesAsync();
                     dept.AddressId = address.Id;
@@ -93,7 +94,7 @@ public class DeptController : Controller
                 _context.Add(dept);
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
-                
+
                 TempData["Success"] = "Department created successfully!";
                 return RedirectToAction(nameof(Index));
             }
@@ -109,6 +110,7 @@ public class DeptController : Controller
     }
 
     // GET: Dept/Edit/5
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Edit(int? id)
     {
         if (id == null) return NotFound();
@@ -124,14 +126,15 @@ public class DeptController : Controller
             .Include(e => e.Job)
             .Where(e => e.Job != null && e.Job.Name == "Director")
             .ToListAsync();
-        
+
         ViewData["DirectorId"] = new SelectList(directors, "Id", "FullName", dept.DirectorId);
         ViewBag.ExistingAddresses = new SelectList(_context.Addresses, "Id", "FullAddress", dept.AddressId);
-        
+
         return View(dept);
     }
 
     // POST: Dept/Edit/5
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, Dept dept, Address address, bool useExistingAddress, int? existingAddressId)
@@ -166,7 +169,7 @@ public class DeptController : Controller
                         await PrepareEditView(dept.Id, dept.DirectorId);
                         return View(dept);
                     }
-                    
+
                     _context.Addresses.Add(address);
                     await _context.SaveChangesAsync();
                     deptToUpdate.AddressId = address.Id;
@@ -174,7 +177,7 @@ public class DeptController : Controller
 
                 _context.Update(deptToUpdate);
                 await _context.SaveChangesAsync();
-                
+
                 TempData["Success"] = "Department updated successfully!";
                 return RedirectToAction(nameof(Index));
             }
@@ -190,6 +193,7 @@ public class DeptController : Controller
     }
 
     // GET: Dept/Delete/5
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int? id)
     {
         if (id == null) return NotFound();
@@ -206,6 +210,7 @@ public class DeptController : Controller
     }
 
     // POST: Dept/Delete/5
+    [Authorize(Roles = "Admin")]
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
@@ -228,7 +233,7 @@ public class DeptController : Controller
             .Include(e => e.Job)
             .Where(e => e.Job != null && e.Job.Name == "Director")
             .ToListAsync();
-        
+
         ViewData["DirectorId"] = new SelectList(directors, "Id", "FullName", selectedDirectorId);
         ViewBag.ExistingAddresses = new SelectList(_context.Addresses, "Id", "FullAddress");
     }
@@ -240,7 +245,7 @@ public class DeptController : Controller
             .Include(e => e.Job)
             .Where(e => e.Job != null && e.Job.Name == "Director")
             .ToListAsync();
-        
+
         ViewData["DirectorId"] = new SelectList(directors, "Id", "FullName", selectedDirectorId);
         ViewBag.ExistingAddresses = new SelectList(_context.Addresses, "Id", "FullAddress");
     }

@@ -184,15 +184,18 @@ public class BookController : Controller
 
     [Authorize(Roles = "Employee, Admin")]
     public async Task<IActionResult> Create(Book book, int[]? selectedAuthors, int[]? selectedGenres,
-        int[]? selectedLanguages, List<DeptCopyInput> departmentCopies)
+        int[]? selectedLanguages, List<DeptCopyInput>? departmentCopies)
     {
         // Usuń walidację dla kolekcji
         ModelState.Remove("Authors");
         ModelState.Remove("Genres");
         ModelState.Remove("Languages");
 
-        // Sprawdź, czy wybrano przynajmniej jeden departament z liczbą kopii > 0
-        if (departmentCopies == null || !departmentCopies.Any(dc => dc.NumberOfCopies > 0))
+        var selectedDepartments = departmentCopies?
+            .Where(dc => dc != null && dc.DeptId > 0 && dc.NumberOfCopies > 0)
+            .ToList() ?? new List<DeptCopyInput>();
+
+        if (!selectedDepartments.Any())
         {
             ModelState.AddModelError("", "Please select at least one department with at least one copy.");
             await PrepareCreateView();
@@ -241,7 +244,7 @@ public class BookController : Controller
                 }
 
                 // Utwórz egzemplarze dla każdego wybranego departamentu
-                foreach (var deptCopy in departmentCopies.Where(dc => dc.NumberOfCopies > 0 && dc.DeptId > 0))
+                foreach (var deptCopy in selectedDepartments)
                 {
                     for (int i = 0; i < deptCopy.NumberOfCopies; i++)
                     {
@@ -258,7 +261,7 @@ public class BookController : Controller
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                TempData["Success"] = $"Book '{book.Title}' created successfully with {departmentCopies.Sum(dc => dc.NumberOfCopies)} copies across selected departments.";
+                TempData["Success"] = $"Book '{book.Title}' created successfully with {selectedDepartments.Sum(dc => dc.NumberOfCopies)} copies across selected departments.";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
