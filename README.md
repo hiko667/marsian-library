@@ -5,9 +5,9 @@
         -    (1 pkt za 1 funkcjonalność, max 15 pkt)   
         - funkcjonalności mają spełniać praktyki wydajnego programowanie w .net: wzorzec repozytorium, dto itd.  
         -    Do jednej funkcjonalności zaliczane są operacje CRUD (np. tworzenie, aktualizacja, wyświetlanie i usuwanie kategorii)
-2. ~~Wdrożenie modeli z wykorzystaniem relacji ManyToMany (przynajmniej 1) i OneToMany . Ok 20 modeli/encji (6-7 os.) z wykorzystaniem ORM (w zależności od zaawansowania i skomplikowania relacji w bazie danych: max 10 pkt) – **tabele biblioteki**~~
+2. - [x] Wdrożenie modeli z wykorzystaniem relacji ManyToMany (przynajmniej 1) i OneToMany . Ok 20 modeli/encji (6-7 os.) z wykorzystaniem ORM (w zależności od zaawansowania i skomplikowania relacji w bazie danych: max 10 pkt) – **tabele biblioteki**
 3. - [x] Realizacja uwierzytelniania z wykorzystaniem modułu ClaimsIdentity. Projekt powinien wspierać przynajmniej dwie role: użytkownika zalogowanego oraz moderatora z wyższymi uprawnieniami. (10 pkt) – **czytelnicy, bibliotekarze**~~
-4. Realizacja przesyłania plików na serwer lokalny lub zdalny z wykorzystaniem formatki HTML file (5 pkt). – **pobieranie ebooków z bazy bibliteki**
+4. - [] Realizacja przesyłania plików na serwer lokalny lub zdalny z wykorzystaniem formatki HTML file (5 pkt). – **pobieranie ebooków z bazy bibliteki**
 5. Estetyczny wygląd aplikacji (5 pkt)
 6. Dokumentacja i jej użyteczność (2 pkt)
 7. Testy automatyczne (max 8 pkt). Pokrycie testami 70-80% głównej logiki aplikacji (bez zapisów do ORM)
