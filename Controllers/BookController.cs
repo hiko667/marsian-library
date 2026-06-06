@@ -159,8 +159,6 @@ public class BookController : Controller
     }
 
     // GET: Book/Create
-    public async Task<IActionResult> Create()
-
     [Authorize(Roles = "Employee, Admin")]
     public async Task<IActionResult> Create()
 
@@ -182,9 +180,6 @@ public class BookController : Controller
     // POST: Book/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(Book book, int[]? selectedAuthors, int[]? selectedGenres,
-        int[]? selectedLanguages, List<DeptCopyInput> departmentCopies)
-
     [Authorize(Roles = "Employee, Admin")]
     public async Task<IActionResult> Create(Book book, int[]? selectedAuthors, int[]? selectedGenres,
         int[]? selectedLanguages, List<DeptCopyInput>? departmentCopies)
