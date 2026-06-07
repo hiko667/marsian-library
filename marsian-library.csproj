@@ -11,6 +11,8 @@
     <Compile Remove="marsian-library.Tests\**" />
     <EmbeddedResource Remove="marsian-library.Tests\**" />
     <None Remove="marsian-library.Tests\**" />
+    <PackageReference Include="ClosedXML" Version="0.105.0" />
+    <PackageReference Include="EPPlus" Version="8.6.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11">
