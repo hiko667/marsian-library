@@ -1,0 +1,48 @@
+@page
+@model marsian_library.Areas.Identity.Pages.Account.Manage.BorrowHistoryModel
+
+@{
+    ViewData["Title"] = "Borrow History";
+}
+
+<h1>Borrow History</h1>
+
+@if (!Model.IsReader)
+{
+    <div class="alert alert-warning">Only users with the Reader role have borrow history.</div>
+}
+else
+{
+    @if (Model.History.Any())
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Copy</th>
+                    <th>Borrowed</th>
+                    <th>Due</th>
+                    <th>Returned</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.History)
+                {
+                    <tr>
+                        <td>@item.BookTitle</td>
+                        <td>@item.CopyId (@item.DeptId)</td>
+                        <td>@item.BorrowDate.ToShortDateString()</td>
+                        <td>@item.ExpectedReturnDate.ToShortDateString()</td>
+                        <td>@(item.ReturnDate.HasValue ? item.ReturnDate.Value.ToShortDateString() : "Not returned")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-info">No borrowing history available.</div>
+    }
+}
+
+<a asp-page="/Account/Manage/Index" class="btn btn-secondary">Back to Account</a>

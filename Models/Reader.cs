@@ -21,4 +21,7 @@ public class Reader
     public string LastName { get; set; } = string.Empty;
 
     public ICollection<Borrow> Borrows { get; set; } = new List<Borrow>();
+
+    [NotMapped]
+    public string FullName => $"{FirstName} {LastName}";
 }

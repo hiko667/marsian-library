@@ -1,32 +1,29 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+// Plik: Controllers/AuthorController.cs
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using marsian_library.Data;
 using marsian_library.Models;
+using marsian_library.Services;
 using Microsoft.AspNetCore.Authorization;
 
 namespace marsian_library.Controllers
 {
     public class AuthorController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly IAuthorService _authorService;
 
-        public AuthorController(AppDbContext context)
+        public AuthorController(IAuthorService authorService)
         {
-            _context = context;
+            _authorService = authorService;
         }
 
-        // GET: Author
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Authors.ToListAsync());
+            var authors = await _authorService.GetAllAuthorsAsync();
+            return View(authors);
         }
 
-        // GET: Author/Details/5
+        // GET: Author/Details
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -34,8 +31,7 @@ namespace marsian_library.Controllers
                 return NotFound();
             }
 
-            var author = await _context.Authors
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var author = await _authorService.GetAuthorByIdAsync(id.Value);
             if (author == null)
             {
                 return NotFound();
@@ -52,8 +48,6 @@ namespace marsian_library.Controllers
         }
 
         // POST: Author/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Employee,Admin")]
@@ -61,14 +55,13 @@ namespace marsian_library.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(author);
-                await _context.SaveChangesAsync();
+                await _authorService.AddAuthorAsync(author);
                 return RedirectToAction(nameof(Index));
             }
             return View(author);
         }
 
-        // GET: Author/Edit/5
+        // GET: Author/Edit
         [Authorize(Roles = "Employee,Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
@@ -77,7 +70,7 @@ namespace marsian_library.Controllers
                 return NotFound();
             }
 
-            var author = await _context.Authors.FindAsync(id);
+            var author = await _authorService.GetAuthorByIdAsync(id.Value);
             if (author == null)
             {
                 return NotFound();
@@ -85,9 +78,7 @@ namespace marsian_library.Controllers
             return View(author);
         }
 
-        // POST: Author/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: Author/Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Employee,Admin")]
@@ -102,12 +93,11 @@ namespace marsian_library.Controllers
             {
                 try
                 {
-                    _context.Update(author);
-                    await _context.SaveChangesAsync();
+                    await _authorService.UpdateAuthorAsync(author);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!AuthorExists(author.Id))
+                    if (!_authorService.AuthorExists(author.Id))
                     {
                         return NotFound();
                     }
@@ -121,7 +111,7 @@ namespace marsian_library.Controllers
             return View(author);
         }
 
-        // GET: Author/Delete/5
+        // GET: Author/Delete
         [Authorize(Roles = "Employee,Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
@@ -130,8 +120,7 @@ namespace marsian_library.Controllers
                 return NotFound();
             }
 
-            var author = await _context.Authors
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var author = await _authorService.GetAuthorByIdAsync(id.Value);
             if (author == null)
             {
                 return NotFound();
@@ -140,25 +129,14 @@ namespace marsian_library.Controllers
             return View(author);
         }
 
-        // POST: Author/Delete/5
+        // POST: Author/Delete
         [Authorize(Roles = "Employee,Admin")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var author = await _context.Authors.FindAsync(id);
-            if (author != null)
-            {
-                _context.Authors.Remove(author);
-            }
-
-            await _context.SaveChangesAsync();
+            await _authorService.DeleteAuthorAsync(id);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool AuthorExists(int id)
-        {
-            return _context.Authors.Any(e => e.Id == id);
         }
     }
 }

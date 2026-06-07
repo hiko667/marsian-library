@@ -14,6 +14,16 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseOracle(connectionString));
 
 
+// ============== DEPENDENCYINJECTIONMAXXXING =============///
+// ........................................................
+//  :   ,-.      ,-.      ,-.      ,-.      ,-.      ,-.   :
+//  : _(*_*)_  _(*_*)_  _(*_*)_  _(*_*)_  _(*_*)_  _(*_*)_ :
+//  :(_  o  _)(_  o  _)(_  o  _)(_  o  _)(_  o  _)(_  o  _):
+//  :  / o \    / o \    / o \    / o \    / o \    / o \  :
+//  : (_/ \_)  (_/ \_)  (_/ \_)  (_/ \_)  (_/ \_)  (_/ \_) :
+//  :......................................................:
+
+//Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => {
     options.Password.RequireDigit = false;
     options.Password.RequiredLength = 4;
@@ -26,12 +36,20 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => {
 .AddDefaultTokenProviders()
 .AddDefaultUI(); 
 
+//Jakieś wbudowane
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddHttpClient<marsian_library.Services.WeatherRaportService>();
+
+//Serwisy odpowiadające MVC
 builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IAuthorService, AuthorService>();
+builder.Services.AddScoped<IBorrowService, BorrowService>();
 
 var app = builder.Build();
+
+//Tu w sumie koniec Serwismaxxingu, poniżej seedowanie
+//Uncle Bob płakał jak czytał
 
 //seeding
 using (var scope = app.Services.CreateScope())
@@ -39,18 +57,26 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     try
     {
-        await DbInitializer.SeedRolesAsync(services);
-        await DbInitializer.SeedAdressAsync(services);
-        await DbInitializer.SeedJobAsync(services);
-        await DbInitializer.SeedAdminAsync(services);
-        await DbInitializer.SeedDepartmentsAsync(services);
+        // Opcja 1: Normalne seedowanie (tylko jeśli dane nie istnieją)
+        //await DbInitializer.SeedAllAsync(services);
+        
+        // Opcja 2: Reset i reseed (usuwa wszystkie dane i dodaje od nowa)
+        //await DbInitializer.ResetAndReseedAsync(services);
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Seeding failed");
+        logger.LogError(ex, "An error occurred while seeding the database.");
     }
 }
+// ........................................................
+//  :   ,-.      ,-.      ,-.      ,-.      ,-.      ,-.   :
+//  : _(*_*)_  _(*_*)_  _(*_*)_  _(*_*)_  _(*_*)_  _(*_*)_ :
+//  :(_  o  _)(_  o  _)(_  o  _)(_  o  _)(_  o  _)(_  o  _):
+//  :  / o \    / o \    / o \    / o \    / o \    / o \  :
+//  : (_/ \_)  (_/ \_)  (_/ \_)  (_/ \_)  (_/ \_)  (_/ \_) :
+//  :......................................................:
+// ======================= END OF DEPENDENCY INJECTION MAXXXIN ==================///
 
 if (!app.Environment.IsDevelopment())
 {

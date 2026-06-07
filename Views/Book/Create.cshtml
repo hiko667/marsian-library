@@ -83,6 +83,7 @@
                                         var dept = departments[i];
                                         <tr>
                                             <td class="text-center">
+                                                <input type="hidden" name="departmentCopies.Index" value="@i" />
                                                 <input type="checkbox" name="departmentCopies[@i].DeptId" 
                                                        value="@dept.Id" class="dept-checkbox" />
                                             </td>

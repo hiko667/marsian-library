@@ -31,14 +31,14 @@ INSERT INTO "Publishers" ("Name") VALUES ('Wydawnictwo Albatros');
 
 
 
-INSERT INTO "Genres" ("Name", "ChildrenFriendly") VALUES ('Science Fiction', 0);
-INSERT INTO "Genres" ("Name", "ChildrenFriendly") VALUES ('Fantasy', 1);
-INSERT INTO "Genres" ("Name", "ChildrenFriendly") VALUES ('Kryminał', 0);
-INSERT INTO "Genres" ("Name", "ChildrenFriendly") VALUES ('Horror', 0);
-INSERT INTO "Genres" ("Name", "ChildrenFriendly") VALUES ('Romans', 0);
-INSERT INTO "Genres" ("Name", "ChildrenFriendly") VALUES ('Literatura piękna', 0);
-INSERT INTO "Genres" ("Name", "ChildrenFriendly") VALUES ('Bajki', 1);
-INSERT INTO "Genres" ("Name", "ChildrenFriendly") VALUES ('Popularnonaukowa', 0);
+INSERT INTO "Genres" ("Name") VALUES ('Science Fiction');
+INSERT INTO "Genres" ("Name") VALUES ('Fantasy');
+INSERT INTO "Genres" ("Name") VALUES ('Kryminał');
+INSERT INTO "Genres" ("Name") VALUES ('Horror');
+INSERT INTO "Genres" ("Name") VALUES ('Romans');
+INSERT INTO "Genres" ("Name") VALUES ('Literatura piękna');
+INSERT INTO "Genres" ("Name") VALUES ('Bajki');
+INSERT INTO "Genres" ("Name") VALUES ('Popularnonaukowa');
 
 
 

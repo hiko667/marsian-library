@@ -552,9 +552,6 @@ namespace marsian_library.Migrations
 
                     OraclePropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<bool>("ChildrenFriendly")
-                        .HasColumnType("NUMBER(1)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
