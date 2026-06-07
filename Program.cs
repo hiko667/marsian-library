@@ -45,6 +45,8 @@ builder.Services.AddHttpClient<marsian_library.Services.WeatherRaportService>();
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IAuthorService, AuthorService>();
 builder.Services.AddScoped<IBorrowService, BorrowService>();
+builder.Services.AddScoped<IGenreService, GenreService>();
+
 
 var app = builder.Build();
 

@@ -1,157 +1,109 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using marsian_library.Data;
 using marsian_library.Models;
+using marsian_library.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace marsian_library.Controllers
 {
     public class GenreController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly IGenreService _genreService;
 
-        public GenreController(AppDbContext context)
+        public GenreController(IGenreService genreService)
         {
-            _context = context;
+            _genreService = genreService;
         }
 
         // GET: Genre
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Genres.ToListAsync());
+            var genres = await _genreService.GetAllAsync();
+            return View(genres);
         }
 
         // GET: Genre/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var genre = await _context.Genres
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (genre == null)
-            {
-                return NotFound();
-            }
+            var genre = await _genreService.GetByIdAsync(id);
+            if (genre == null) return NotFound();
 
             return View(genre);
         }
 
         // GET: Genre/Create
+        [Authorize(Roles = "Employee,Admin")]
         public IActionResult Create()
         {
             return View();
         }
 
         // POST: Genre/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name")] Genre genre)
+        [Authorize(Roles = "Employee,Admin")]
+        public async Task<IActionResult> Create([Bind("Id,Name,ChildrenFriendly")] Genre genre)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(genre);
-                await _context.SaveChangesAsync();
+                await _genreService.CreateAsync(genre);
                 return RedirectToAction(nameof(Index));
             }
             return View(genre);
         }
 
         // GET: Genre/Edit/5
+        [Authorize(Roles = "Employee,Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var genre = await _context.Genres.FindAsync(id);
-            if (genre == null)
-            {
-                return NotFound();
-            }
+            var genre = await _genreService.GetByIdAsync(id);
+            if (genre == null) return NotFound();
+            
             return View(genre);
         }
 
         // POST: Genre/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Genre genre)
+        [Authorize(Roles = "Employee,Admin")]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,ChildrenFriendly")] Genre genre)
         {
-            if (id != genre.Id)
-            {
-                return NotFound();
-            }
+            if (id != genre.Id) return NotFound();
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(genre);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!GenreExists(genre.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                var result = await _genreService.UpdateAsync(id, genre);
+                if (!result) return NotFound();
+
                 return RedirectToAction(nameof(Index));
             }
             return View(genre);
         }
 
         // GET: Genre/Delete/5
+        [Authorize(Roles = "Employee,Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var genre = await _context.Genres
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (genre == null)
-            {
-                return NotFound();
-            }
+            var genre = await _genreService.GetByIdAsync(id);
+            if (genre == null) return NotFound();
 
             return View(genre);
         }
 
         // POST: Genre/Delete/5
         [HttpPost, ActionName("Delete")]
+        [Authorize(Roles = "Employee,Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var genre = await _context.Genres.FindAsync(id);
-            if (genre != null)
-            {
-                _context.Genres.Remove(genre);
-            }
-
-            await _context.SaveChangesAsync();
+            await _genreService.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool GenreExists(int id)
-        {
-            return _context.Genres.Any(e => e.Id == id);
         }
     }
 }
