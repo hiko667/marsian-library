@@ -1,31 +1,27 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using marsian_library.Data;
 using marsian_library.Models;
+using marsian_library.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 
 namespace marsian_library.Controllers
 {
-
     [Authorize(Roles = "Employee,Admin")]
     public class LanguageController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly ILanguageService _languageService;
 
-        public LanguageController(AppDbContext context)
+        public LanguageController(ILanguageService languageService)
         {
-            _context = context;
+            _languageService = languageService;
         }
 
         // GET: Language
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Languages.ToListAsync());
+            var languages = await _languageService.GetAllAsync();
+            return View(languages);
         }
 
         // GET: Language/Details/5
@@ -36,8 +32,7 @@ namespace marsian_library.Controllers
                 return NotFound();
             }
 
-            var language = await _context.Languages
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var language = await _languageService.GetByIdAsync(id);
             if (language == null)
             {
                 return NotFound();
@@ -47,31 +42,25 @@ namespace marsian_library.Controllers
         }
 
         // GET: Language/Create
-        
         public IActionResult Create()
         {
             return View();
         }
 
         // POST: Language/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        
         public async Task<IActionResult> Create([Bind("Id,Name")] Language language)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(language);
-                await _context.SaveChangesAsync();
+                await _languageService.CreateAsync(language);
                 return RedirectToAction(nameof(Index));
             }
             return View(language);
         }
 
         // GET: Language/Edit/5
-        
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -79,7 +68,7 @@ namespace marsian_library.Controllers
                 return NotFound();
             }
 
-            var language = await _context.Languages.FindAsync(id);
+            var language = await _languageService.GetByIdAsync(id);
             if (language == null)
             {
                 return NotFound();
@@ -88,11 +77,8 @@ namespace marsian_library.Controllers
         }
 
         // POST: Language/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Language language)
         {
             if (id != language.Id)
@@ -104,12 +90,11 @@ namespace marsian_library.Controllers
             {
                 try
                 {
-                    _context.Update(language);
-                    await _context.SaveChangesAsync();
+                    await _languageService.UpdateAsync(language);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!LanguageExists(language.Id))
+                    if (!_languageService.Exists(language.Id))
                     {
                         return NotFound();
                     }
@@ -124,7 +109,6 @@ namespace marsian_library.Controllers
         }
 
         // GET: Language/Delete/5
-        
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -132,8 +116,7 @@ namespace marsian_library.Controllers
                 return NotFound();
             }
 
-            var language = await _context.Languages
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var language = await _languageService.GetByIdAsync(id);
             if (language == null)
             {
                 return NotFound();
@@ -144,23 +127,11 @@ namespace marsian_library.Controllers
 
         // POST: Language/Delete/5
         [HttpPost, ActionName("Delete")]
-        
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var language = await _context.Languages.FindAsync(id);
-            if (language != null)
-            {
-                _context.Languages.Remove(language);
-            }
-
-            await _context.SaveChangesAsync();
+            await _languageService.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool LanguageExists(int id)
-        {
-            return _context.Languages.Any(e => e.Id == id);
         }
     }
 }
