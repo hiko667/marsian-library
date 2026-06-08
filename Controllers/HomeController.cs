@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using marsian_library.Models;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace marsian_library.Controllers;
 
@@ -17,7 +19,9 @@ public class HomeController : Controller
     {
         return View();
     }
-    public IActionResult BookCrud()
+    
+    [Authorize(Roles = "Employee, Admin")]
+    public IActionResult Operations()
     {
         return View();
     }

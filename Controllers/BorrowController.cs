@@ -11,6 +11,7 @@ using marsian_library.Models;
 
 namespace marsian_library.Controllers
 {
+        [Authorize(Roles = "Employee, Admin")]
     public class BorrowController : Controller
     {
         private readonly AppDbContext _context;
@@ -23,7 +24,10 @@ namespace marsian_library.Controllers
         // GET: Borrow
         public async Task<IActionResult> Index()
         {
-            var appDbContext = _context.Borrows.Include(b => b.Copy).Include(b => b.Reader);
+            var appDbContext = _context.Borrows.Include(b => b.Copy)
+                                               .Include(b => b.Reader)
+                                               .Include(b => b.Copy.Book)
+                                               .OrderByDescending(b => b.BorrowDate);
             return View(await appDbContext.ToListAsync());
         }
 
@@ -38,6 +42,7 @@ namespace marsian_library.Controllers
             var borrow = await _context.Borrows
                 .Include(b => b.Copy)
                 .Include(b => b.Reader)
+                .Include(b => b.Copy.Book)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (borrow == null)
             {
@@ -149,7 +154,7 @@ namespace marsian_library.Controllers
         }
 
         // POST: Borrow/Return/5
-        [Authorize(Roles = "Employee, Admin")]
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Return(int id, int? readerId)

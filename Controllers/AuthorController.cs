@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace marsian_library.Controllers
 {
+    [Authorize(Roles = "Employee, Admin")]
     public class AuthorController : Controller
     {
         private readonly AppDbContext _context;
