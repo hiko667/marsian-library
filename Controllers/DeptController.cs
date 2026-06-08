@@ -1,30 +1,25 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using marsian_library.Data;
 using marsian_library.Models;
+using marsian_library.Services;
 
 namespace marsian_library.Controllers;
 
 public class DeptController : Controller
 {
-    private readonly AppDbContext _context;
+    private readonly IDeptService _deptService;
 
-    public DeptController(AppDbContext context)
+    public DeptController(IDeptService deptService)
     {
-        _context = context;
+        _deptService = deptService;
     }
 
     // GET: Dept
     public async Task<IActionResult> Index()
     {
-        var depts = _context.Depts
-            .Include(d => d.Address)
-            .Include(d => d.Director)
-            .ThenInclude(d => d.Job);
-        return View(await depts.ToListAsync());
+        var depts = await _deptService.GetAllDeptsAsync();
+        return View(depts);
     }
 
     // GET: Dept/Details/5
@@ -32,31 +27,20 @@ public class DeptController : Controller
     {
         if (id == null) return NotFound();
 
-        var dept = await _context.Depts
-            .Include(d => d.Address)
-            .Include(d => d.Director)
-            .ThenInclude(d => d.Job)
-            .FirstOrDefaultAsync(m => m.Id == id);
-
+        var dept = await _deptService.GetDeptByIdAsync(id.Value);
         if (dept == null) return NotFound();
 
         return View(dept);
     }
+
     [Authorize(Roles = "Admin")]
     // GET: Dept/Create
     public async Task<IActionResult> Create()
     {
-        // Pobierz tylko pracowników ze stanowiskiem "Director"
-        var directors = await _context.Emps
-            .Include(e => e.Job)
-            .Where(e => e.Job != null && e.Job.Name == "Director")
-            .ToListAsync();
-
-        ViewData["DirectorId"] = new SelectList(directors, "Id", "FullName");
-        ViewBag.ExistingAddresses = new SelectList(_context.Addresses, "Id", "FullAddress");
-
+        await PrepareCreateView();
         return View();
     }
+
     // POST: Dept/Create
     [Authorize(Roles = "Admin")]
     [HttpPost]
@@ -65,44 +49,13 @@ public class DeptController : Controller
     {
         if (ModelState.IsValid)
         {
-            using var transaction = await _context.Database.BeginTransactionAsync();
-
-            try
+            var success = await _deptService.CreateDeptAsync(dept, address, useExistingAddress, existingAddressId);
+            if (success)
             {
-                // Obsługa adresu
-                if (useExistingAddress && existingAddressId.HasValue)
-                {
-                    // Użyj istniejącego adresu
-                    dept.AddressId = existingAddressId.Value;
-                }
-                else
-                {
-                    // Utwórz nowy adres
-                    if (string.IsNullOrEmpty(address.City) || string.IsNullOrEmpty(address.Street) ||
-                        string.IsNullOrEmpty(address.Building) || string.IsNullOrEmpty(address.ZipCode))
-                    {
-                        ModelState.AddModelError("", "All address fields are required when creating a new address.");
-                        await PrepareCreateView(dept.DirectorId);
-                        return View(dept);
-                    }
-
-                    _context.Addresses.Add(address);
-                    await _context.SaveChangesAsync();
-                    dept.AddressId = address.Id;
-                }
-
-                _context.Add(dept);
-                await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
-
                 TempData["Success"] = "Department created successfully!";
                 return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
-            {
-                await transaction.RollbackAsync();
-                ModelState.AddModelError("", $"Error creating department: {ex.Message}");
-            }
+            ModelState.AddModelError("", "Error creating department. Check address fields.");
         }
 
         await PrepareCreateView(dept.DirectorId);
@@ -115,21 +68,10 @@ public class DeptController : Controller
     {
         if (id == null) return NotFound();
 
-        var dept = await _context.Depts
-            .Include(d => d.Address)
-            .FirstOrDefaultAsync(d => d.Id == id);
-
+        var dept = await _deptService.GetDeptByIdAsync(id.Value);
         if (dept == null) return NotFound();
 
-        // Pobierz tylko pracowników ze stanowiskiem "Director"
-        var directors = await _context.Emps
-            .Include(e => e.Job)
-            .Where(e => e.Job != null && e.Job.Name == "Director")
-            .ToListAsync();
-
-        ViewData["DirectorId"] = new SelectList(directors, "Id", "FullName", dept.DirectorId);
-        ViewBag.ExistingAddresses = new SelectList(_context.Addresses, "Id", "FullAddress", dept.AddressId);
-
+        await PrepareEditView(dept.DirectorId, dept.AddressId);
         return View(dept);
     }
 
@@ -143,52 +85,16 @@ public class DeptController : Controller
 
         if (ModelState.IsValid)
         {
-            try
+            var success = await _deptService.UpdateDeptAsync(id, dept, address, useExistingAddress, existingAddressId);
+            if (success)
             {
-                var deptToUpdate = await _context.Depts
-                    .Include(d => d.Address)
-                    .FirstOrDefaultAsync(d => d.Id == id);
-
-                if (deptToUpdate == null) return NotFound();
-
-                // Aktualizuj podstawowe informacje
-                deptToUpdate.DirectorId = dept.DirectorId;
-
-                // Obsługa adresu
-                if (useExistingAddress && existingAddressId.HasValue)
-                {
-                    deptToUpdate.AddressId = existingAddressId.Value;
-                }
-                else
-                {
-                    // Utwórz nowy adres
-                    if (string.IsNullOrEmpty(address.City) || string.IsNullOrEmpty(address.Street) ||
-                        string.IsNullOrEmpty(address.Building) || string.IsNullOrEmpty(address.ZipCode))
-                    {
-                        ModelState.AddModelError("", "All address fields are required when creating a new address.");
-                        await PrepareEditView(dept.Id, dept.DirectorId);
-                        return View(dept);
-                    }
-
-                    _context.Addresses.Add(address);
-                    await _context.SaveChangesAsync();
-                    deptToUpdate.AddressId = address.Id;
-                }
-
-                _context.Update(deptToUpdate);
-                await _context.SaveChangesAsync();
-
                 TempData["Success"] = "Department updated successfully!";
                 return RedirectToAction(nameof(Index));
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!DeptExists(dept.Id)) return NotFound();
-                throw;
-            }
+            ModelState.AddModelError("", "Error updating department. Check address fields.");
         }
 
-        await PrepareEditView(dept.Id, dept.DirectorId);
+        await PrepareEditView(dept.DirectorId, dept.AddressId);
         return View(dept);
     }
 
@@ -198,12 +104,7 @@ public class DeptController : Controller
     {
         if (id == null) return NotFound();
 
-        var dept = await _context.Depts
-            .Include(d => d.Address)
-            .Include(d => d.Director)
-            .ThenInclude(d => d.Job)
-            .FirstOrDefaultAsync(m => m.Id == id);
-
+        var dept = await _deptService.GetDeptByIdAsync(id.Value);
         if (dept == null) return NotFound();
 
         return View(dept);
@@ -215,38 +116,25 @@ public class DeptController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
-        var dept = await _context.Depts.FindAsync(id);
-        if (dept != null) _context.Depts.Remove(dept);
-        await _context.SaveChangesAsync();
+        await _deptService.DeleteDeptAsync(id);
         return RedirectToAction(nameof(Index));
     }
 
-    private bool DeptExists(int id)
-    {
-        return _context.Depts.Any(e => e.Id == id);
-    }
-
-    // Pomocnicza metoda do przygotowania widoku Create
     private async Task PrepareCreateView(int? selectedDirectorId = null)
     {
-        var directors = await _context.Emps
-            .Include(e => e.Job)
-            .Where(e => e.Job != null && e.Job.Name == "Director")
-            .ToListAsync();
+        var directors = await _deptService.GetDirectorsAsync();
+        var addresses = await _deptService.GetAddressesAsync();
 
         ViewData["DirectorId"] = new SelectList(directors, "Id", "FullName", selectedDirectorId);
-        ViewBag.ExistingAddresses = new SelectList(_context.Addresses, "Id", "FullAddress");
+        ViewBag.ExistingAddresses = new SelectList(addresses, "Id", "FullAddress");
     }
 
-    // Pomocnicza metoda do przygotowania widoku Edit
-    private async Task PrepareEditView(int deptId, int? selectedDirectorId = null)
+    private async Task PrepareEditView(int? selectedDirectorId = null, int? selectedAddressId = null)
     {
-        var directors = await _context.Emps
-            .Include(e => e.Job)
-            .Where(e => e.Job != null && e.Job.Name == "Director")
-            .ToListAsync();
+        var directors = await _deptService.GetDirectorsAsync();
+        var addresses = await _deptService.GetAddressesAsync();
 
         ViewData["DirectorId"] = new SelectList(directors, "Id", "FullName", selectedDirectorId);
-        ViewBag.ExistingAddresses = new SelectList(_context.Addresses, "Id", "FullAddress");
+        ViewBag.ExistingAddresses = new SelectList(addresses, "Id", "FullAddress", selectedAddressId);
     }
 }

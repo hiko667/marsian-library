@@ -1,30 +1,27 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using marsian_library.Data;
 using marsian_library.Models;
+using marsian_library.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 
 namespace marsian_library.Controllers
 {
     [Authorize(Roles = "Employee,Admin")]
     public class PublisherController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly IPublisherService _publisherService;
 
-        public PublisherController(AppDbContext context)
+        public PublisherController(IPublisherService publisherService)
         {
-            _context = context;
+            _publisherService = publisherService;
         }
 
         // GET: Publisher
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Publishers.ToListAsync());
+            var publishers = await _publisherService.GetAllAsync();
+            return View(publishers);
         }
 
         // GET: Publisher/Details/5
@@ -35,8 +32,7 @@ namespace marsian_library.Controllers
                 return NotFound();
             }
 
-            var publisher = await _context.Publishers
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var publisher = await _publisherService.GetByIdAsync(id.Value);
             if (publisher == null)
             {
                 return NotFound();
@@ -53,8 +49,6 @@ namespace marsian_library.Controllers
         }
 
         // POST: Publisher/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         
@@ -62,14 +56,14 @@ namespace marsian_library.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(publisher);
-                await _context.SaveChangesAsync();
+                await _publisherService.CreateAsync(publisher);
                 return RedirectToAction(nameof(Index));
             }
             return View(publisher);
         }
 
         // GET: Publisher/Edit/5
+        [Authorize(Roles = "Employee,Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -77,7 +71,7 @@ namespace marsian_library.Controllers
                 return NotFound();
             }
 
-            var publisher = await _context.Publishers.FindAsync(id);
+            var publisher = await _publisherService.GetByIdAsync(id.Value);
             if (publisher == null)
             {
                 return NotFound();
@@ -86,8 +80,6 @@ namespace marsian_library.Controllers
         }
 
         // POST: Publisher/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         
@@ -102,12 +94,11 @@ namespace marsian_library.Controllers
             {
                 try
                 {
-                    _context.Update(publisher);
-                    await _context.SaveChangesAsync();
+                    await _publisherService.UpdateAsync(publisher);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!PublisherExists(publisher.Id))
+                    if (!await _publisherService.ExistsAsync(publisher.Id))
                     {
                         return NotFound();
                     }
@@ -130,8 +121,7 @@ namespace marsian_library.Controllers
                 return NotFound();
             }
 
-            var publisher = await _context.Publishers
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var publisher = await _publisherService.GetByIdAsync(id.Value);
             if (publisher == null)
             {
                 return NotFound();
@@ -146,19 +136,8 @@ namespace marsian_library.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var publisher = await _context.Publishers.FindAsync(id);
-            if (publisher != null)
-            {
-                _context.Publishers.Remove(publisher);
-            }
-
-            await _context.SaveChangesAsync();
+            await _publisherService.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool PublisherExists(int id)
-        {
-            return _context.Publishers.Any(e => e.Id == id);
         }
     }
 }
