@@ -14,6 +14,16 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseOracle(connectionString));
 
 
+// ============== DEPENDENCYINJECTIONMAXXXING =============///
+// ........................................................
+//  :   ,-.      ,-.      ,-.      ,-.      ,-.      ,-.   :
+//  : _(*_*)_  _(*_*)_  _(*_*)_  _(*_*)_  _(*_*)_  _(*_*)_ :
+//  :(_  o  _)(_  o  _)(_  o  _)(_  o  _)(_  o  _)(_  o  _):
+//  :  / o \    / o \    / o \    / o \    / o \    / o \  :
+//  : (_/ \_)  (_/ \_)  (_/ \_)  (_/ \_)  (_/ \_)  (_/ \_) :
+//  :......................................................:
+
+//Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => {
     options.Password.RequireDigit = false;
     options.Password.RequiredLength = 4;
@@ -26,11 +36,20 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => {
 .AddDefaultTokenProviders()
 .AddDefaultUI(); 
 
+//Jakieś wbudowane
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+builder.Services.AddHttpClient<marsian_library.Services.WeatherRaportService>();
+
+//Serwisy odpowiadające MVC
 builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IAuthorService, AuthorService>();
+builder.Services.AddScoped<IBorrowService, BorrowService>();
 
 var app = builder.Build();
+
+//Tu w sumie koniec Serwismaxxingu, poniżej seedowanie
+//Uncle Bob płakał jak czytał
 
 //seeding
 using (var scope = app.Services.CreateScope())
@@ -50,6 +69,14 @@ using (var scope = app.Services.CreateScope())
         logger.LogError(ex, "An error occurred while seeding the database.");
     }
 }
+// ........................................................
+//  :   ,-.      ,-.      ,-.      ,-.      ,-.      ,-.   :
+//  : _(*_*)_  _(*_*)_  _(*_*)_  _(*_*)_  _(*_*)_  _(*_*)_ :
+//  :(_  o  _)(_  o  _)(_  o  _)(_  o  _)(_  o  _)(_  o  _):
+//  :  / o \    / o \    / o \    / o \    / o \    / o \  :
+//  : (_/ \_)  (_/ \_)  (_/ \_)  (_/ \_)  (_/ \_)  (_/ \_) :
+//  :......................................................:
+// ======================= END OF DEPENDENCY INJECTION MAXXXIN ==================///
 
 if (!app.Environment.IsDevelopment())
 {
