@@ -85,7 +85,7 @@ namespace marsian_library.Controllers
 
         // POST: Borrow/Edit/5
         [HttpPost]
-        [ValidateAntiForgeryToken￼￼￼]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,CopyId,ReaderId,BorrowDate,ExpectedReturnDate,ReturnDate,TimesExtended")] Borrow borrow)
         {
             if (id != borrow.Id)
