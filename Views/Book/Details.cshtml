@@ -116,12 +116,15 @@
                                 else
                                 {
                                     var borrowers = ViewBag.CopyBorrowers as Dictionary<int, marsian_library.Models.Reader>;
-                                    if (borrowers != null && borrowers.TryGetValue(copy.Id, out var borrower) && borrower != null)
+                                    @if (User.Identity != null && User.Identity.IsAuthenticated && (User.IsInRole("Employee") || User.IsInRole("Admin")))
                                     {
-                                        <a asp-controller="Reader" asp-action="Details" asp-route-id="@borrower.Id"
-                                           class="btn btn-sm btn-secondary">
-                                            Borrowed by @($"{borrower.FirstName} {borrower.LastName}")
-                                        </a>
+                                        if (borrowers != null && borrowers.TryGetValue(copy.Id, out var borrower) && borrower != null)
+                                        {
+                                            <a asp-controller="Reader" asp-action="Details" asp-route-id="@borrower.Id"
+                                               class="btn btn-sm btn-secondary">
+                                                Borrowed by @($"{borrower.FirstName} {borrower.LastName}")
+                                            </a>
+                                        }
                                     }
                                     else
                                     {

@@ -13,7 +13,7 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Copy)
+                @Html.DisplayNameFor(model => model.Copy.Book.Title)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Reader)
@@ -37,10 +37,14 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Copy.Id)
+                <a asp-controller="Book" asp-action="Details" asp-route-id="@item.Copy.BookId">
+                    @Html.DisplayFor(modelItem => item.Copy.Book.Title)
+                </a>
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Reader.FirstName)
+                <a asp-controller="Reader" asp-action="Details" asp-route-id="@item.ReaderId">
+                    @Html.DisplayFor(modelItem => item.Reader.FullName)
+                </a>
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.BorrowDate)

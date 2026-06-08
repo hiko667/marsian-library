@@ -1,11 +1,16 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using marsian_library.Data;
 using marsian_library.Models;
 using marsian_library.Services;
 using Microsoft.AspNetCore.Authorization;
 
 namespace marsian_library.Controllers
 {
+    [Authorize(Roles = "Employee, Admin")]
     public class GenreController : Controller
     {
         private readonly IGenreService _genreService;

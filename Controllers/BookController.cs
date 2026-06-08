@@ -467,7 +467,6 @@ public class BookController : Controller
 
     // POST: Book/Delete/5
     [HttpPost, ActionName("Delete")]
-
     [ValidateAntiForgeryToken]
     [Authorize(Roles = "Employee,Admin")]
     public async Task<IActionResult> DeleteConfirmed(int id)

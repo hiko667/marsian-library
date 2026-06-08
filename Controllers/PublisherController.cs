@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace marsian_library.Controllers
 {
+    [Authorize(Roles = "Employee,Admin")]
     public class PublisherController : Controller
     {
         private readonly IPublisherService _publisherService;
@@ -41,7 +42,7 @@ namespace marsian_library.Controllers
         }
 
         // GET: Publisher/Create
-        [Authorize(Roles = "Employee,Admin")]
+        
         public IActionResult Create()
         {
             return View();
@@ -50,7 +51,7 @@ namespace marsian_library.Controllers
         // POST: Publisher/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Employee,Admin")]
+        
         public async Task<IActionResult> Create([Bind("Id,Name")] Publisher publisher)
         {
             if (ModelState.IsValid)
@@ -81,7 +82,7 @@ namespace marsian_library.Controllers
         // POST: Publisher/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Employee,Admin")]
+        
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Publisher publisher)
         {
             if (id != publisher.Id)
@@ -112,7 +113,7 @@ namespace marsian_library.Controllers
         }
 
         // GET: Publisher/Delete/5
-        [Authorize(Roles = "Employee,Admin")]
+        
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -130,7 +131,7 @@ namespace marsian_library.Controllers
         }
 
         // POST: Publisher/Delete/5
-        [Authorize(Roles = "Employee,Admin")]
+        
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
