@@ -1,4 +1,3 @@
-// Plik: Tests/GenreControllerTests.cs
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -16,7 +15,7 @@ namespace marsian_library.Tests
         {
             // Arrange
             var mockService = new Mock<IGenreService>();
-            var expectedGenre = new Genre { Id = 1, Name = "Sci-Fi"};
+            var expectedGenre = new Genre { Id = 1, Name = "Ninja Novel"};
             
             mockService.Setup(service => service.GetByIdAsync(1))
                        .ReturnsAsync(expectedGenre);
@@ -30,7 +29,7 @@ namespace marsian_library.Tests
             var viewResult = Assert.IsType<ViewResult>(result);
             var model = Assert.IsType<Genre>(viewResult.Model);
             Assert.Equal(1, model.Id);
-            Assert.Equal("Sci-Fi", model.Name);
+            Assert.Equal("Ninja Novel", model.Name);
         }
     }
 }
