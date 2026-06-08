@@ -8,6 +8,7 @@ using marsian_library.Services;
 
 namespace marsian_library.Controllers
 {
+        [Authorize(Roles = "Employee, Admin")]
     public class BorrowController : Controller
     {
         private readonly IBorrowService _borrowService;
@@ -84,7 +85,7 @@ namespace marsian_library.Controllers
 
         // POST: Borrow/Edit/5
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken￼￼￼]
         public async Task<IActionResult> Edit(int id, [Bind("Id,CopyId,ReaderId,BorrowDate,ExpectedReturnDate,ReturnDate,TimesExtended")] Borrow borrow)
         {
             if (id != borrow.Id)
@@ -134,7 +135,7 @@ namespace marsian_library.Controllers
         }
 
         // POST: Borrow/Return/5
-        [Authorize(Roles = "Employee, Admin")]
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Return(int id, int? readerId)

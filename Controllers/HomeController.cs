@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using marsian_library.Models;
+using Microsoft.AspNetCore.Authorization;
 using marsian_library.Services;
 
 namespace marsian_library.Controllers;
@@ -21,7 +22,9 @@ public class HomeController : Controller
         var weatherData = await _weatherService.GetWeatherAsync();
         return View(weatherData);
     }
-    public IActionResult BookCrud()
+    
+    [Authorize(Roles = "Employee, Admin")]
+    public IActionResult Operations()
     {
         return View();
     }

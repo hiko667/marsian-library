@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace marsian_library.Controllers
 {
+
+    [Authorize(Roles = "Employee,Admin")]
     public class LanguageController : Controller
     {
         private readonly AppDbContext _context;
@@ -45,7 +47,7 @@ namespace marsian_library.Controllers
         }
 
         // GET: Language/Create
-        [Authorize(Roles = "Employee,Admin")]
+        
         public IActionResult Create()
         {
             return View();
@@ -56,7 +58,7 @@ namespace marsian_library.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Employee,Admin")]
+        
         public async Task<IActionResult> Create([Bind("Id,Name")] Language language)
         {
             if (ModelState.IsValid)
@@ -69,7 +71,7 @@ namespace marsian_library.Controllers
         }
 
         // GET: Language/Edit/5
-        [Authorize(Roles = "Employee,Admin")]
+        
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -90,7 +92,7 @@ namespace marsian_library.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Employee,Admin")]
+        
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Language language)
         {
             if (id != language.Id)
@@ -122,7 +124,7 @@ namespace marsian_library.Controllers
         }
 
         // GET: Language/Delete/5
-        [Authorize(Roles = "Employee,Admin")]
+        
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -142,7 +144,7 @@ namespace marsian_library.Controllers
 
         // POST: Language/Delete/5
         [HttpPost, ActionName("Delete")]
-        [Authorize(Roles = "Employee,Admin")]
+        
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
