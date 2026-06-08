@@ -47,6 +47,8 @@ builder.Services.AddScoped<IAuthorService, AuthorService>();
 builder.Services.AddScoped<IBorrowService, BorrowService>();
 builder.Services.AddScoped<IGenreService, GenreService>();
 builder.Services.AddScoped<IDeptService, DeptService>();
+builder.Services.AddScoped<IPublisherService, PublisherService>();
+
 
 
 
