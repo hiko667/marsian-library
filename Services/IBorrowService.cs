@@ -14,6 +14,7 @@ namespace marsian_library.Services
         Task<bool> BorrowExistsAsync(int id);
         Task<bool> ReturnBookAsync(int id);
         Task<IEnumerable<Copy>> GetCopiesAsync();
-        Task<IEnumerable<Reader>> GetReadersAsync();
+        Task<IEnumerable<Reader>> GetReadersAsync();        
+        Task<string?> GetBookTitleByBorrowIdAsync(int borrowId);
     }
 }

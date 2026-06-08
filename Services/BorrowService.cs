@@ -18,13 +18,18 @@ namespace marsian_library.Services
 
         public async Task<IEnumerable<Borrow>> GetAllBorrowsAsync()
         {
-            return await _context.Borrows.Include(b => b.Copy).Include(b => b.Reader).ToListAsync();
+            return await _context.Borrows
+                .Include(b => b.Copy)
+                    .ThenInclude(c => c.Book)
+                .Include(b => b.Reader)
+                .ToListAsync();
         }
 
         public async Task<Borrow?> GetBorrowByIdAsync(int id)
         {
             return await _context.Borrows
                 .Include(b => b.Copy)
+                    .ThenInclude(c => c.Book)
                 .Include(b => b.Reader)
                 .FirstOrDefaultAsync(m => m.Id == id);
         }
@@ -70,7 +75,6 @@ namespace marsian_library.Services
             if (borrow.ReturnDate == null)
             {
                 borrow.ReturnDate = DateTime.Now;
-
                 var availableState = await _context.States.FirstOrDefaultAsync(s => s.Name == "Available");
                 if (availableState == null)
                 {
@@ -98,6 +102,16 @@ namespace marsian_library.Services
         public async Task<IEnumerable<Reader>> GetReadersAsync()
         {
             return await _context.Readers.ToListAsync();
+        }
+
+        public async Task<string?> GetBookTitleByBorrowIdAsync(int borrowId)
+        {
+            var borrow = await _context.Borrows
+                .Include(b => b.Copy)
+                    .ThenInclude(c => c.Book)
+                .FirstOrDefaultAsync(b => b.Id == borrowId);
+
+            return borrow?.Copy?.Book?.Title;
         }
     }
 }
