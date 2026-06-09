@@ -14,7 +14,7 @@ namespace marsian_library.Controllers
     public class ReaderController : Controller
     {
         private readonly AppDbContext _context;
-        private readonly int PageSize = 10;
+        private readonly int PageSize = 8;
 
         public ReaderController(AppDbContext context)
         {

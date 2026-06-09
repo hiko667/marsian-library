@@ -9,7 +9,11 @@ html {
   }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
@@ -27,24 +31,39 @@ body {
   transition: "all 0.3s ease"
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+.form-floating>.form-control-plaintext::placeholder,
+.form-floating>.form-control::placeholder {
   color: var(--bs-secondary-color);
   text-align: end;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+.form-floating>.form-control-plaintext:focus::placeholder,
+.form-floating>.form-control:focus::placeholder {
   text-align: start;
 }
 
-.bg-mars-dark {
-    background-color: #8b0000 !important;
+.accordion-button:hover {
+  background-color: #8b0000;
+  color: white;
 }
 
-.navbar-mars .nav-link, .navbar-mars .navbar-brand {
-    color: white !important;
+
+.accordion-button:not(.collapsed) {
+  background-color: #8b0000;
+  color: white;
 }
+
+.bg-mars-dark {
+  background-color: #8b0000 !important;
+}
+
+.navbar-mars .nav-link,
+.navbar-mars .navbar-brand {
+  color: white !important;
+}
+
 .flex-grow-1 {
-    flex-grow: 1;
+  flex-grow: 1;
 }
 
 /* .no-transition {
@@ -53,12 +72,12 @@ body {
 .no-transition * {
     transition: none !important;
 } */
-body, 
-header, 
-nav, 
-footer, 
-.card, 
+body,
+header,
+nav,
+footer,
+.card,
 .btn,
 a {
-    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
