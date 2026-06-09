@@ -15,11 +15,13 @@ public class BookController : Controller
     private readonly AppDbContext _context;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly int PageSize = 9;
+    private readonly IWebHostEnvironment _webHostEnvironment;
 
-    public BookController(AppDbContext context, UserManager<ApplicationUser> userManager)
+    public BookController(AppDbContext context, UserManager<ApplicationUser> userManager, IWebHostEnvironment webHostEnvironment)
     {
         _context = context;
         _userManager = userManager;
+        _webHostEnvironment = webHostEnvironment;
     }
 
     // GET: Book/Index
@@ -182,7 +184,7 @@ public class BookController : Controller
     [ValidateAntiForgeryToken]
     [Authorize(Roles = "Employee, Admin")]
     public async Task<IActionResult> Create(Book book, int[]? selectedAuthors, int[]? selectedGenres,
-        int[]? selectedLanguages, List<DeptCopyInput>? departmentCopies)
+        int[]? selectedLanguages, List<DeptCopyInput>? departmentCopies, IFormFile? coverFile)
     {
         // Usuń walidację dla kolekcji
         ModelState.Remove("Authors");
@@ -233,6 +235,30 @@ public class BookController : Controller
                 // Zapisz książkę
                 _context.Add(book);
                 await _context.SaveChangesAsync();
+
+                // Cover image
+                if (coverFile != null && coverFile.Length > 0)
+                {
+                    var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
+                    var extension = Path.GetExtension(coverFile.FileName).ToLower();
+                    
+                    if (!allowedExtensions.Contains(extension))
+                    {
+                        throw new Exception("Invalid image format. Only JPG, JPEG and PNG are allowed.");
+                    }
+
+                    string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "covers");
+                    if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+                    string uniqueFileName = book.Id + extension;
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    // Save image
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await coverFile.CopyToAsync(fileStream);
+                    }
+                }
 
                 // Pobierz stan "Available" (zakładając, że istnieje)
                 var availableState = await _context.States.FirstOrDefaultAsync(s => s.Name == "Available");
@@ -315,7 +341,7 @@ public class BookController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, Book book, int[]? selectedAuthors, int[]? selectedGenres,
-        int[]? selectedLanguages, Dictionary<int, int> addCopies, Dictionary<int, int> removeCopies)
+        int[]? selectedLanguages, Dictionary<int, int> addCopies, Dictionary<int, int> removeCopies, IFormFile? coverFile)
     {
         if (id != book.Id) return NotFound();
 
@@ -373,6 +399,32 @@ public class BookController : Controller
                 }
 
                 await _context.SaveChangesAsync();
+
+                // Cover image edit
+                if (coverFile != null && coverFile.Length > 0)
+                {
+                    var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
+                    var extension = Path.GetExtension(coverFile.FileName).ToLower();
+                    
+                    if (allowedExtensions.Contains(extension))
+                    {
+                        string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "covers");
+                        if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+                        // if the old cover had a different extension
+                        foreach (var ext in allowedExtensions)
+                        {
+                            var oldFile = Path.Combine(uploadsFolder, bookToUpdate.Id + ext);
+                            if (System.IO.File.Exists(oldFile)) System.IO.File.Delete(oldFile);
+                        }
+
+                        string filePath = Path.Combine(uploadsFolder, bookToUpdate.Id + extension);
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await coverFile.CopyToAsync(fileStream);
+                        }
+                    }
+                }
 
                 // Obsługa dodawania kopii
                 var availableState = await _context.States.FirstOrDefaultAsync(s => s.Name == "Available");
@@ -467,13 +519,41 @@ public class BookController : Controller
 
     // POST: Book/Delete/5
     [HttpPost, ActionName("Delete")]
+
     [ValidateAntiForgeryToken]
     [Authorize(Roles = "Employee,Admin")]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
         var book = await _context.Books.FindAsync(id);
-        if (book != null) _context.Books.Remove(book);
-        await _context.SaveChangesAsync();
+        if (book != null)
+        {
+            string[] extensions = { ".jpg", ".jpeg", ".png" };
+            
+            foreach (var ext in extensions)
+            {
+                var filePath = Path.Combine(_webHostEnvironment.WebRootPath, "covers", id + ext);
+                
+                // Sprawdzamy, czy plik fizycznie istnieje na dysku serwera
+                if (System.IO.File.Exists(filePath))
+                {
+                    try
+                    {
+                        System.IO.File.Delete(filePath);
+                        break;
+                    }
+                    catch (IOException ex)
+                    {
+                        ModelState.AddModelError("", $"Could not delete cover file: {ex.Message}");
+                    }
+                }
+            }
+
+            _context.Books.Remove(book);
+            await _context.SaveChangesAsync();
+            
+            TempData["Success"] = "Book and its cover image were successfully deleted.";
+        }
+
         return RedirectToAction(nameof(Index));
     }
 

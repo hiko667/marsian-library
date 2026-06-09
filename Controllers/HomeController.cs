@@ -42,41 +42,4 @@ public class HomeController : Controller
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
-
-    [HttpPost]
-    [Authorize(Roles = "Employee,Admin")]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> UploadFile(IFormFile file)
-    {
-        if (file == null || file.Length == 0)
-        {
-            TempData["ErrorMessage"] = "Nie wybrano pliku lub plik jest pusty.";
-            return RedirectToAction("BookCrud");
-        }
-
-        try
-        {
-            string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads");
-            if (!Directory.Exists(uploadsFolder))
-            {
-                Directory.CreateDirectory(uploadsFolder);
-            }
-
-            string uniqueFileName = file.FileName;
-            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
-            {
-                await file.CopyToAsync(fileStream);
-            }
-
-            TempData["SuccessMessage"] = $"Plik '{uniqueFileName}' został pomyślnie przesłany na serwer!";
-        }
-        catch (System.Exception ex)
-        {
-            TempData["ErrorMessage"] = $"Błąd podczas zapisu pliku: {ex.Message}";
-        }
-
-        return RedirectToAction("BookCrud");
-    }
 }
