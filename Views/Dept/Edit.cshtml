@@ -9,31 +9,113 @@
 <h4>Dept</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-6">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="AddressId" class="control-label"></label>
-                <select asp-for="AddressId" class="form-control" asp-items="ViewBag.AddressId"></select>
-                <span asp-validation-for="AddressId" class="text-danger"></span>
-            </div>
+
             <div class="form-group">
                 <label asp-for="DirectorId" class="control-label"></label>
-                <select asp-for="DirectorId" class="form-control" asp-items="ViewBag.DirectorId"></select>
+                <select asp-for="DirectorId" class="form-control" asp-items="ViewBag.DirectorId">
+                    <option value="">-- Select Director --</option>
+                </select>
                 <span asp-validation-for="DirectorId" class="text-danger"></span>
             </div>
-            <div class="form-group">
+
+            <div class="form-group mt-3">
+                <label class="control-label">Address</label>
+                <div class="mb-2">
+                    <div class="form-check">
+                        <input type="radio" id="useExistingAddress" name="useExistingAddress" value="true" class="form-check-input" checked />
+                        <label for="useExistingAddress" class="form-check-label">Use existing address</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" id="createNewAddress" name="useExistingAddress" value="false" class="form-check-input" />
+                        <label for="createNewAddress" class="form-check-label">Create new address</label>
+                    </div>
+                </div>
+            </div>
+
+            <div id="existingAddressSection" class="form-group">
+                <label class="control-label">Select Existing Address</label>
+                <select name="existingAddressId" class="form-control" asp-items="ViewBag.ExistingAddresses">
+                    <option value="">-- Select Address --</option>
+                </select>
+            </div>
+
+            <div id="newAddressSection" style="display: none;">
+                <div class="card mt-2 mb-3">
+                    <div class="card-header">
+                        <strong>New Address Details</strong>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="control-label">City *</label>
+                            <input name="address.City" value="@Model.Address?.City" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Street *</label>
+                            <input name="address.Street" value="@Model.Address?.Street" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Building *</label>
+                            <input name="address.Building" value="@Model.Address?.Building" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Apartment</label>
+                            <input name="address.Apartment" value="@Model.Address?.Apartment" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Zip Code *</label>
+                            <input name="address.ZipCode" value="@Model.Address?.ZipCode" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group mt-3">
                 <input type="submit" value="Save" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        const useExistingRadio = document.getElementById('useExistingAddress');
+        const createNewRadio = document.getElementById('createNewAddress');
+        const existingSection = document.getElementById('existingAddressSection');
+        const newSection = document.getElementById('newAddressSection');
+
+        function toggleAddressSections() {
+            if (useExistingRadio.checked) {
+                existingSection.style.display = 'block';
+                newSection.style.display = 'none';
+                document.querySelectorAll('#newAddressSection input').forEach(input => {
+                    input.required = false;
+                });
+                const existingSelect = document.querySelector('select[name="existingAddressId"]');
+                if (existingSelect) existingSelect.required = true;
+            } else {
+                existingSection.style.display = 'none';
+                newSection.style.display = 'block';
+                document.querySelectorAll('#newAddressSection input[name*="address."]').forEach(input => {
+                    if (input.name === 'address.Apartment') {
+                        input.required = false;
+                    } else {
+                        input.required = true;
+                    }
+                });
+                const existingSelect = document.querySelector('select[name="existingAddressId"]');
+                if (existingSelect) existingSelect.required = false;
+            }
+        }
+
+        useExistingRadio.addEventListener('change', toggleAddressSections);
+        createNewRadio.addEventListener('change', toggleAddressSections);
+
+        toggleAddressSections();
+    </script>
 }

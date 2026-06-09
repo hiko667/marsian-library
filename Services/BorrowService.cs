@@ -22,6 +22,8 @@ namespace marsian_library.Services
                 .Include(b => b.Copy)
                     .ThenInclude(c => c.Book)
                 .Include(b => b.Reader)
+                .OrderByDescending(b => b.ReturnDate == null)
+                .ThenByDescending(b => b.BorrowDate)
                 .ToListAsync();
         }
 

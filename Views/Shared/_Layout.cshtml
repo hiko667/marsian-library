@@ -1,6 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Identity
-@using marsian_library.Models
-@inject UserManager<ApplicationUser> UserManager
+
+
 
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark" id="theme-html">
@@ -36,19 +36,6 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Book" asp-action="Index">Search books</a>
                         </li>
-
-                        @if (User.Identity != null && User.Identity.IsAuthenticated)
-                        {
-                            var currentUser = await UserManager.GetUserAsync(User);
-                            if (currentUser != null && currentUser.ReaderId.HasValue)
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" href="/api/BookApi/export" download>
-                                        My Borrows
-                                    </a>
-                                </li>
-                            }
-                        }
 
                     </ul>
                     <div class="d-flex align-items-center me-2">
