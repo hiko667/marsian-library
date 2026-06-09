@@ -1,21 +1,32 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
 using Moq;
 using Xunit;
 using marsian_library.Controllers;
 using marsian_library.Services;
+using marsian_library.Models;
+
 namespace marsian_library.Tests;
 
 public class BookApiControllerTests
 {
     private readonly Mock<IBookService> _mockBookService;
+    private readonly Mock<UserManager<ApplicationUser>> _mockUserManager;
     private readonly BookApiController _controller;
 
     public BookApiControllerTests()
     {
         _mockBookService = new Mock<IBookService>();
-        _controller = new BookApiController(_mockBookService.Object);
+        
+        // Mock UserManager
+        _mockUserManager = new Mock<UserManager<ApplicationUser>>(
+            new Mock<IUserStore<ApplicationUser>>().Object,
+            null, null, null, null, null, null, null, null
+        );
+        
+        _controller = new BookApiController(_mockBookService.Object, _mockUserManager.Object);
     }
 
     [Fact]
