@@ -26,14 +26,6 @@
                 <label asp-for="Input.ConfirmPassword">Confirm Password</label>
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
             </div>
-            <div class="form-floating mb-3">
-                <select asp-for="Input.Role" class="form-control" id="roleSelect">
-                    <option value="">-- Pick Your Role --</option>
-                    <option value="Reader">Reader</option>
-                    <option value="Employee">Employee</option>
-                </select>
-                <label asp-for="Input.Role">Role</label>
-            </div>
 
             <div class="form-floating mb-3">
                 <input asp-for="Input.FirstName" class="form-control" />
@@ -43,16 +35,10 @@
                 <input asp-for="Input.LastName" class="form-control" />
                 <label asp-for="Input.LastName">Last Name</label>
             </div>
-            <div id="employeeFields" style="display:none;">
+            @* <div id="employeeFields" style="display:none;">
                 <div class="form-floating mb-3">
                     <select asp-for="Input.DeptId" class="form-control" asp-items="ViewBag.Depts"></select>
                     <label asp-for="Input.DeptId">Department</label>
-                </div>
-                <div class="form-floating mb-3">
-                    <select asp-for="Input.DeptId" class="form-control" asp-items="ViewBag.Depts">
-                        <option value="">-- Pick Department --</option>
-                    </select>
-                    <label asp-for="Input.DeptId"></label>
                 </div>
                 <div class="form-floating mb-3">
                     <select asp-for="Input.JobId" class="form-control" asp-items="ViewBag.Jobs">
@@ -60,7 +46,7 @@
                     </select>
                     <label asp-for="Input.JobId"></label>
                 </div>
-            </div>  
+            </div>   *@
             <h4>Adress Data</h4>
                 <hr />
                 <div class="form-floating mb-3">
@@ -101,7 +87,7 @@
     </div>
 </div>
 
-@section Scripts {
+@* @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
         document.getElementById('roleSelect').addEventListener('change', function () {
@@ -113,4 +99,4 @@
             }
         });
     </script>
-}
+} *@

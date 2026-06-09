@@ -38,6 +38,7 @@ namespace marsian_library.Areas.Identity.Pages.Account
             UserManager<ApplicationUser> userManager,
             IUserStore<ApplicationUser> userStore,
             SignInManager<ApplicationUser> signInManager,
+            AppDbContext context,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender)
         {
@@ -45,6 +46,7 @@ namespace marsian_library.Areas.Identity.Pages.Account
             _userStore = userStore;
             _emailStore = GetEmailStore();
             _signInManager = signInManager;
+            _context = context;
             _logger = logger;
             _emailSender = emailSender;
         }
@@ -102,8 +104,8 @@ namespace marsian_library.Areas.Identity.Pages.Account
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
 
-            [Required(ErrorMessage = "Pick Role")]
-            public string Role { get; set; }
+            // [Required(ErrorMessage = "Pick Role")]
+            // public string Role { get; set; }
 
             [Required]
             public string FirstName { get; set; }
@@ -119,9 +121,9 @@ namespace marsian_library.Areas.Identity.Pages.Account
             public string? Apartment { get; set; }
             [Required]
             public string ZipCode { get; set; }
-            [Required]
-            public int? DeptId { get; set; }
-            public int? JobId { get; set; }
+            // [Required]
+            // public int? DeptId { get; set; }
+            // public int? JobId { get; set; }
         }
 
 
@@ -152,32 +154,32 @@ namespace marsian_library.Areas.Identity.Pages.Account
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
-                if (Input.Role == "Employee")
+                // if (Input.Role == "Employee")
+                // {
+                //     var emp = new Emp
+                //     {
+                //         FirstName = Input.FirstName,
+                //         LastName = Input.LastName,
+                //         AddressId = newAddress.Id,
+                //         DeptId = Input.DeptId ?? 0,
+                //         JobId = Input.JobId ?? 0
+                //     };
+                //     _context.Emps.Add(emp);
+                //     await _context.SaveChangesAsync();
+                //     user.EmpId = emp.Id;
+                // }
+                // else if (Input.Role == "Reader")
+                // {
+                var reader = new Reader
                 {
-                    var emp = new Emp
-                    {
-                        FirstName = Input.FirstName,
-                        LastName = Input.LastName,
-                        AddressId = newAddress.Id,
-                        DeptId = Input.DeptId ?? 0,
-                        JobId = Input.JobId ?? 0
-                    };
-                    _context.Emps.Add(emp);
-                    await _context.SaveChangesAsync();
-                    user.EmpId = emp.Id;
-                }
-                else if (Input.Role == "Reader")
-                {
-                    var reader = new Reader
-                    {
-                        FirstName = Input.FirstName,
-                        LastName = Input.LastName,
-                        AddressId = newAddress.Id
-                    };
-                    _context.Readers.Add(reader);
-                    await _context.SaveChangesAsync();
-                    user.ReaderId = reader.Id; 
-                }
+                    FirstName = Input.FirstName,
+                    LastName = Input.LastName,
+                    AddressId = newAddress.Id
+                };
+                _context.Readers.Add(reader);
+                await _context.SaveChangesAsync();
+                user.ReaderId = reader.Id; 
+                // }
 
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
@@ -185,7 +187,7 @@ namespace marsian_library.Areas.Identity.Pages.Account
                 {
                     _logger.LogInformation("User created a new account with password.");
 
-                    await _userManager.AddToRoleAsync(user, Input.Role);
+                    await _userManager.AddToRoleAsync(user, "Reader");
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
