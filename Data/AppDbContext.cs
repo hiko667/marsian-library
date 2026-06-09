@@ -64,7 +64,7 @@ namespace marsian_library.Data
 
             builder.Entity<ApplicationUser>()
                 .HasOne(u => u.Emp)
-                .WithOne()
+                .WithOne(e => e.ApplicationUser)
                 .HasForeignKey<ApplicationUser>(u => u.EmpId);
         }
     }

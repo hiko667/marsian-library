@@ -31,4 +31,7 @@ public class Emp
 
     [NotMapped]
     public string FullName => $"{FirstName} {LastName}";
+
+    [InverseProperty(nameof(ApplicationUser.Emp))]
+    public virtual ApplicationUser? ApplicationUser { get; set; }
 }
