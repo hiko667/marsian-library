@@ -56,7 +56,8 @@
 
     <footer class="border-top footer text-white bg-gradient bg-mars-dark">
         <div class="container">
-            &copy; 2026 - Marsian Library - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            @* shows current year *@
+            &copy; @DateTime.Now.Year - Marsian Library - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
